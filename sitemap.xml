@@ -4,85 +4,85 @@ xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitem
 xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-<loc>sdphome.github.io/index.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/index.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/archives.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/archives.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/categories.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/categories.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/about.html</loc>
+<loc>http://sdphome.github.io/about.html</loc>
 <lastmod>2016-05-19T20:05:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/agreement.html</loc>
+<loc>http://sdphome.github.io/agreement.html</loc>
 <lastmod>2013-12-04T15:01:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/guestbook.html</loc>
+<loc>http://sdphome.github.io/guestbook.html</loc>
 <lastmod>2013-09-09T21:43:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/my_gnupg.html</loc>
+<loc>http://sdphome.github.io/my_gnupg.html</loc>
 <lastmod>2014-06-25T17:47:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/my_projects.html</loc>
+<loc>http://sdphome.github.io/my_projects.html</loc>
 <lastmod>2014-06-24T13:01:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/essay/test.html</loc>
+<loc>http://sdphome.github.io/essay/test.html</loc>
 <lastmod>2016-05-19T19:20:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/essay/index.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/essay/index.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/tag/blog.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/tag/blog.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>sdphome.github.io/tag/first.html</loc>
-<lastmod>2016-05-19T20:57:46-00:00</lastmod>
+<loc>http://sdphome.github.io/tag/first.html</loc>
+<lastmod>2016-05-19T21:11:42-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>

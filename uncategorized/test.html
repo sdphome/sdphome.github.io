@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>first - SDP日常笔记</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="/theme/css/niu2.min.css" type="text/css" />
@@ -34,19 +34,47 @@
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
         <li><a href="/tag/index.html">
-                <i class="fa fa-tag"></i>Tag</a>
+                <i class="fa fa-tag"></i>标签</a>
         </li>
         <li><a href="/archives.html">
-                <i class="fa fa-archive"></i>Archive
+                <i class="fa fa-archive"></i>存档
             </a>
         </li>
         <!-- category dropdown list -->
+        <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-folder-open"></i>分类<b class="caret"></b>
+           </a>
+           <ul class="dropdown-menu">
+               <li><a href="/uncategorized/index.html">
+                   <i class="fa fa-folder-close"></i>uncategorized
+                      (1)</a></li>
+           </ul>
+        </li>
         <!--  self defined dropdown list -->
         </ul>
         
         <!-- right nav bar -->
         <ul class="nav navbar-nav navbar-right">
         <!-- google custom search -->
+        <li>
+        <div id="niu2-cse-wrapper">
+            <div id="niu2-cse-header-box" class="navbar-form navbar-nav">
+                <form action="http://google.com/cse">
+                    <input type="hidden" name="cx" value="016153735682458819581:d-c6xpkcmcy" />
+                    <input type="hidden" name="ie" value="UTF-8" />
+                    <div class="form-group">
+                        <input id="niu2-cse-search-input" class="niu2-cse-header form-control" 
+                            type="text" name="q" 
+                            placeholder="按回车开始搜索 ..."/>
+                    </div>
+                </form>
+           </div>
+           <div id="niu2-cse-ctrl-box" class="navbar-nav">
+            <i id="niu2-cse-search-image" class="fa fa-search navbar-nav"></i><span id="niu2-cse-search-text">搜索</span>
+           </div>
+       </div>
+       </li>
        </ul>
     </nav>
 </div>
@@ -59,7 +87,7 @@
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
         <p>Slug: test</p>
-<h1 id="pelican">pelican</h1>
+<h1 id="dcd32506cf523bff4286671e2eb5fa8d">pelican</h1>
 <p>Pelican Static Site Generator, Powered by Python：Pelican是python语言写的静态网站生成器。</p>
     </div>
     <div id="content-comments">
@@ -68,24 +96,34 @@
 </div>
 <div class="niu2-right-container col-md-2">
     <div id="niu2-sidebar-meta" class="niu2-sidebar">
-        <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>Published:</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
         <div class="niu2-sidebar-value">2016-02-28 00:00</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-open-folder"></i>Category:</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-open-folder"></i>分类:</div>
         <div class="niu2-sidebar-value"><a href="/uncategorized/index.html">uncategorized</a></div>
-        <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>Tag:</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
  
             <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="/tag/first.html">first</a><sup>1</sup></div>
     </div>
 
     <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
         <div class="niu2-sidebar-label">
-            <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>TOC
+            <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
         </div>
         <ol id="niu2-sidebar-toc-list">
             <li><a href="#content-heading">first</a></li>
-            <li><a href='#pelican'>pelican</a>
+            <li><a href='#dcd32506cf523bff4286671e2eb5fa8d'>pelican</a>
         </ol>
     </div>
+</div>
+<div id="niu2-toolbar">
+    <ul class="list-unstyled">
+        <li><a id="niu2-toolbar-ctrlsidebar" href="#" title="隐藏侧边栏"><i class="fa fa-3x fa-chevron-circle-right"></i></a></li>
+        <li><a id="niu2-toolbar-revhistory" href="#" title="修订历史"><i class="fa fa-3x fa-clock-o"></i></a></li>
+        <li><a id="niu2-toolbar-viewsource" href="#" title="查看源文件"><i class="fa fa-file-text-o" style="font-size:2.65em;margin-top:2px;"></i></a></li>
+    </ul>
+    <div id="niu2-toolbar-showsidebar" data-title="显示侧边栏"></div>
+    <div id="niu2-toolbar-github" data-repo="sdphome/blog-content"></div>
+    <div id="niu2-toolbar-bitbucket" data-repo=""></div>
 </div>
     </div>
 
@@ -112,6 +150,7 @@
     <script type="text/javascript" src="/theme/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="/theme/js/niu2.min.js"></script>
     <script type="text/javascript" src="/theme/js/bootstrap.min.js"></script>
+    <div id="niu2-lazy-load-text" data-loading="orz 努力加载中"></div>
     <script type="text/javascript">onContentLoaded();</script>
   </body>
 </html>

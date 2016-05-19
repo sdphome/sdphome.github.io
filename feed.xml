@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel><title>SDP日常笔记</title><link>/</link><description></description><lastBuildDate>Sun, 28 Feb 2016 00:00:00 +0800</lastBuildDate><item><title>first</title><link>/uncategorized/test.html</link><description>&lt;p&gt;Slug: test&lt;/p&gt;
+&lt;h1 id="pelican"&gt;pelican&lt;/h1&gt;
+&lt;p&gt;Pelican Static Site Generator, Powered by Python：Pelican是python语言写的静态网站生成器。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">shaodepeng</dc:creator><pubDate>Sun, 28 Feb 2016 00:00:00 +0800</pubDate><guid isPermaLink="false">tag:,2016-02-28:uncategorized/test.html</guid><category>first</category></item></channel></rss>

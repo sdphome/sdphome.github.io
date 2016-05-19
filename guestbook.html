@@ -3,11 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>uncategorized - SDP日常笔记</title>
+    <title>留言簿 - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="/theme/css/niu2.min.css" type="text/css" />
+
+    <link rel="canonical" href="/guestbook.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -31,25 +33,40 @@
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
-        <li><a href="/tag/index.html">
+            <li><a href="/about.html" title="about me">
+                <i class="fa fa-anchor"></i>关于</a>
+            </li>
+            <li><a href="/agreement.html" title="agreement">
+                <i class="fa fa-info-circle"></i>使用协议</a>
+            </li>
+            <li><a href="/tag/" title="tags">
                 <i class="fa fa-tag"></i>标签</a>
-        </li>
-        <li><a href="/archives.html">
-                <i class="fa fa-archive"></i>存档
-            </a>
-        </li>
+            </li>
         <!-- category dropdown list -->
         <li class="dropdown">
            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-folder-open"></i>分类<b class="caret"></b>
            </a>
            <ul class="dropdown-menu">
-               <li><a href="/uncategorized/index.html">
-                   <i class="fa fa-folder-close"></i>uncategorized
+               <li><a href="/essay/index.html">
+                      <i class="fa fa-leaf"></i>随笔
                       (1)</a></li>
            </ul>
         </li>
         <!--  self defined dropdown list -->
+        <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               <i class="fa fa-archive"></i>存档<b class="caret"></b>
+           </a>
+           <ul class="dropdown-menu">
+               <li><a href="/archives.html" title="archives order by publish time">
+                 <i class="fa fa-calendar"></i>存档 (按发布时间)</a>
+               </li>
+               <li><a href="/archives_updatedate.html" title="archives order by modify time">
+                 <i class="fa fa-pencil"></i>存档 (按修改时间)</a>
+               </li>
+           </ul>
+        </li>
         </ul>
         
         <!-- right nav bar -->
@@ -80,42 +97,46 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-
-<h1 class="niu2-index-title">
-<i class="fa fa fa-folder-open"></i>uncategorized
-</h1>
-
+    <h1 id="content-heading">留言簿</h1>
+</div>
+<div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
+    <div id="niu2-main-content">
+        <p>Just say something ...</p>
+    </div>
+    <div id="content-comments">
 </div>
 
-<div class="col-md-8 col-md-offset-2">
-    <div class="niu2-index-article">
-        <div class="niu2-index-article-title">
-            <span>
-                <a href="/uncategorized/test.html">first</a>
-            </span>
-        </div>
-<div class="niu2-meta-index">
-    <span class="niu2-meta-date-index">
-        <i class="fa fa-calendar"></i>2016-02-28
-    </span>
-    <span class="niu2-meta-category-index">
-        <i class="fa fa-open-folder"></i>uncategorized
-    </span>
-    <span class="niu2-meta-tag-index">
-        <i class="fa fa-tag"></i>
-        <a href="/tag/first.html">first</a>
-    </span>
-</div>        <div class="niu2-article-summary">
-            Slug: test
-        </div>
+</div> 
+<div class="niu2-right-container col-md-2">
+<div id="niu2-sidebar-meta" class="niu2-sidebar">
+    <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
+    <div class="niu2-sidebar-value">2013-09-09 21:43</div>
+    <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
+    <div class="niu2-sidebar-value">2013-09-09 21:43</div>
+</div>
+
+<div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
+    <div class="niu2-sidebar-label">
+        <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
     </div>
-
-
-
+    <ol id="niu2-sidebar-toc-list">
+        <li><a href="#content-heading">留言簿</a></li>
+        
+    </ol>
+</div></div>
+<div id="niu2-toolbar">
+    <ul class="list-unstyled">
+        <li><a id="niu2-toolbar-ctrlsidebar" href="#" title="隐藏侧边栏"><i class="fa fa-3x fa-chevron-circle-right"></i></a></li>
+        <li><a id="niu2-toolbar-revhistory" href="#" title="修订历史"><i class="fa fa-3x fa-clock-o"></i></a></li>
+        <li><a id="niu2-toolbar-viewsource" href="#" title="查看源文件"><i class="fa fa-file-text-o" style="font-size:2.65em;margin-top:2px;"></i></a></li>
+    </ul>
+    <div id="niu2-toolbar-showsidebar" data-title="显示侧边栏"></div>
+    <div id="niu2-toolbar-github" data-repo="sdphome/blog-content"></div>
+    <div id="niu2-toolbar-bitbucket" data-repo=""></div>
 </div>
     </div>
 
-<div id="body-footer" class="col-md-8 col-md-offset-2">
+    <div id="body-footer" class="col-md-6 col-md-offset-2">
 <div class="niu2-footer">
     <hr/>
 	<p>
@@ -128,10 +149,21 @@
 		©
 				2016
 		<a class="niu2-footer-link" href="">shaodepeng</a>
+        / 			<a class="niu2-footer-link" href="/about.html" title="about me">关于</a>
+        / 			<a class="niu2-footer-link" href="/agreement.html" title="terms, license and privacy etc.">协议</a>
     </p>
     <p class="niu2-icons">
+	        <a class="niu2-footer-icon" href="mailto: dp.shao@gmail.com" title="my email address">
+	            <i class="fa fa-envelope-o fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="http://github.com/sdphome" title="my github page">
+	            <i class="fa fa-github-alt fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="/feed.xml" title="subscribe my blog">
+	            <i class="fa fa-rss fa-lg"></i>
+	        </a>
 	</p>
-</div></div>
+</div>    </div>
 <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-77974223-1"]);_gaq.push(["_trackPageview"]);(function(){var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)})();</script>    
     <div id="niu2-pygments" data-theme="github"></div>
 
@@ -139,6 +171,6 @@
     <script type="text/javascript" src="/theme/js/niu2.min.js"></script>
     <script type="text/javascript" src="/theme/js/bootstrap.min.js"></script>
     <div id="niu2-lazy-load-text" data-loading="orz 努力加载中"></div>
-    <script type="text/javascript"></script>
+    <script type="text/javascript">onContentLoaded();</script>
   </body>
 </html>

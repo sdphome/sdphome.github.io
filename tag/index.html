@@ -31,25 +31,40 @@
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
-        <li><a href="/tag/index.html">
+            <li><a href="/about.html" title="about me">
+                <i class="fa fa-anchor"></i>关于</a>
+            </li>
+            <li><a href="/agreement.html" title="agreement">
+                <i class="fa fa-info-circle"></i>使用协议</a>
+            </li>
+            <li><a href="/tag/" title="tags">
                 <i class="fa fa-tag"></i>标签</a>
-        </li>
-        <li><a href="/archives.html">
-                <i class="fa fa-archive"></i>存档
-            </a>
-        </li>
+            </li>
         <!-- category dropdown list -->
         <li class="dropdown">
            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <i class="fa fa-folder-open"></i>分类<b class="caret"></b>
            </a>
            <ul class="dropdown-menu">
-               <li><a href="/uncategorized/index.html">
-                   <i class="fa fa-folder-close"></i>uncategorized
+               <li><a href="/essay/index.html">
+                      <i class="fa fa-leaf"></i>随笔
                       (1)</a></li>
            </ul>
         </li>
         <!--  self defined dropdown list -->
+        <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               <i class="fa fa-archive"></i>存档<b class="caret"></b>
+           </a>
+           <ul class="dropdown-menu">
+               <li><a href="/archives.html" title="archives order by publish time">
+                 <i class="fa fa-calendar"></i>存档 (按发布时间)</a>
+               </li>
+               <li><a href="/archives_updatedate.html" title="archives order by modify time">
+                 <i class="fa fa-pencil"></i>存档 (按修改时间)</a>
+               </li>
+           </ul>
+        </li>
         </ul>
         
         <!-- right nav bar -->
@@ -103,8 +118,19 @@
 		©
 				2016
 		<a class="niu2-footer-link" href="">shaodepeng</a>
+        / 			<a class="niu2-footer-link" href="/about.html" title="about me">关于</a>
+        / 			<a class="niu2-footer-link" href="/agreement.html" title="terms, license and privacy etc.">协议</a>
     </p>
     <p class="niu2-icons">
+	        <a class="niu2-footer-icon" href="mailto: dp.shao@gmail.com" title="my email address">
+	            <i class="fa fa-envelope-o fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="http://github.com/sdphome" title="my github page">
+	            <i class="fa fa-github-alt fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="/feed.xml" title="subscribe my blog">
+	            <i class="fa fa-rss fa-lg"></i>
+	        </a>
 	</p>
 </div></div>
 <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-77974223-1"]);_gaq.push(["_trackPageview"]);(function(){var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)})();</script>    
@@ -117,6 +143,7 @@
 <script type="text/javascript" src="/theme/js/tagcloud.min.js"></script>
     <script type="text/javascript">
 var tc = TagCloud.create();
+tc.add('blog', 1, '/tag/blog.html', null);
 tc.add('first', 1, '/tag/first.html', null);
 tc.loadEffector('CountSize');tc.loadEffector('CountSize');
 

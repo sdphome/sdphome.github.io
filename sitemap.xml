@@ -5,21 +5,21 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://sdphome.github.io/index.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/archives.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/categories.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -60,29 +60,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://sdphome.github.io/essay/test.html</loc>
-<lastmod>2016-05-20T09:46:00:%s</lastmod>
+<loc>http://sdphome.github.io/ubuntu/sudoers-777-unable-root.html</loc>
+<lastmod>2016-05-20T14:39:02:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/essay/index.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<loc>http://sdphome.github.io/ubuntu/index.html</loc>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/tag/blog.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<loc>http://sdphome.github.io/tag/sudoers.html</loc>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/tag/first.html</loc>
-<lastmod>2016-05-20T09:46:24-00:00</lastmod>
+<loc>http://sdphome.github.io/tag/root.html</loc>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://sdphome.github.io/tag/ubuntu.html</loc>
+<lastmod>2016-05-20T14:40:08-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>

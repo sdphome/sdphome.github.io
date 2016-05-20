@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>SDP日常笔记</title><link>http://sdphome.github.io/</link><description></description><lastBuildDate>Thu, 19 May 2016 19:20:00 +0800</lastBuildDate><item><title>first gitpages blog</title><link>http://sdphome.github.io/essay/test.html</link><description>&lt;h2 id="dcd32506cf523bff4286671e2eb5fa8d"&gt;pelican&lt;/h2&gt;
-&lt;p&gt;Pelican Static Site Generator, Powered by Python：Pelican是python语言写的静态网站生成器。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Thu, 19 May 2016 19:20:00 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2016-05-19:essay/test.html</guid><category>first</category><category>blog</category></item></channel></rss>
+<rss version="2.0"><channel><title>SDP日常笔记</title><link>http://sdphome.github.io/</link><description></description><lastBuildDate>Mon, 23 Jun 2014 18:26:01 +0800</lastBuildDate><item><title>sudoers文件属性为777后无法使用root</title><link>http://sdphome.github.io/ubuntu/sudoers-777-unable-root.html</link><description>&lt;h2 id="d6cfc9817231ad285f5e51b0d89b9e6e"&gt;问题形成原因&lt;/h2&gt;
+&lt;p&gt;在使用ubuntu时有时为了添加root权限，需要将用户信息添加进&lt;code&gt;/etc/sudoers&lt;/code&gt;，有些人为了方便，将这个文件的权限修改为777了，接着发现sudo的时候想使用root权限不可以了..&lt;/p&gt;
+&lt;h2 id="957a228f87aaf86e436762129485625a"&gt;解决方法&lt;/h2&gt;
+&lt;p&gt;重启机器，在开机的过程中长按&lt;code&gt;shift&lt;/code&gt;键，使ubuntu进入grub mode，进入root shell，在root shell中输入下面两条命令即可:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mount -o rw,remount /
+chmod 440 /etc/sudoers
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Mon, 23 Jun 2014 18:26:01 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2014-06-23:ubuntu/sudoers-777-unable-root.html</guid><category>root</category><category>ubuntu</category><category>sudoers</category></item></channel></rss>

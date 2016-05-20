@@ -3,13 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>first gitpages blog - SDP日常笔记</title>
+    <title>sudoers文件属性为777后无法使用root - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
 
-    <link rel="canonical" href="http://sdphome.github.io/essay/test.html" />
+    <link rel="canonical" href="http://sdphome.github.io/ubuntu/sudoers-777-unable-root.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -48,8 +48,8 @@
                 <i class="fa fa-folder-open"></i>分类<b class="caret"></b>
            </a>
            <ul class="dropdown-menu">
-               <li><a href="http://sdphome.github.io/essay/index.html">
-                      <i class="fa fa-leaf"></i>随笔
+               <li><a href="http://sdphome.github.io/ubuntu/index.html">
+                      <i class="fa fa-linux"></i>ubuntu
                       (1)</a></li>
            </ul>
         </li>
@@ -97,12 +97,17 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-    <h1 id="content-heading">first gitpages blog</h1>
+    <h1 id="content-heading">sudoers文件属性为777后无法使用root</h1>
 </div>
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
-        <h2 id="dcd32506cf523bff4286671e2eb5fa8d">pelican</h2>
-<p>Pelican Static Site Generator, Powered by Python：Pelican是python语言写的静态网站生成器。</p>
+        <h2 id="d6cfc9817231ad285f5e51b0d89b9e6e">问题形成原因</h2>
+<p>在使用ubuntu时有时为了添加root权限，需要将用户信息添加进<code>/etc/sudoers</code>，有些人为了方便，将这个文件的权限修改为777了，接着发现sudo的时候想使用root权限不可以了..</p>
+<h2 id="957a228f87aaf86e436762129485625a">解决方法</h2>
+<p>重启机器，在开机的过程中长按<code>shift</code>键，使ubuntu进入grub mode，进入root shell，在root shell中输入下面两条命令即可:</p>
+<div class="highlight"><pre><span></span>mount -o rw,remount /
+chmod 440 /etc/sudoers
+</pre></div>
     </div>
     <div id="content-comments">
 <div id="disqus_thread"></div>
@@ -115,15 +120,16 @@
 <div class="niu2-right-container col-md-2">
     <div id="niu2-sidebar-meta" class="niu2-sidebar">
         <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
-        <div class="niu2-sidebar-value">2016-05-19 19:20</div>
+        <div class="niu2-sidebar-value">2014-06-23 18:26</div>
         <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
-        <div class="niu2-sidebar-value">2016-05-20 09:46</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-leaf"></i>分类:</div>
-        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/essay/index.html">随笔</a></div>
+        <div class="niu2-sidebar-value">2016-05-20 14:39</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-linux"></i>分类:</div>
+        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/ubuntu/index.html">ubuntu</a></div>
         <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
  
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/first.html">first</a><sup>1</sup></div>
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/blog.html">blog</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/root.html">root</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/ubuntu.html">ubuntu</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/sudoers.html">sudoers</a><sup>1</sup></div>
     </div>
 
     <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
@@ -131,8 +137,8 @@
             <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
         </div>
         <ol id="niu2-sidebar-toc-list">
-            <li><a href="#content-heading">first gitpages blog</a></li>
-            <li><a href='#dcd32506cf523bff4286671e2eb5fa8d'>pelican</a>
+            <li><a href="#content-heading">sudoers文件属性为777后无法使用root</a></li>
+            <li><a href='#d6cfc9817231ad285f5e51b0d89b9e6e'>问题形成原因</a></li><li><a href='#957a228f87aaf86e436762129485625a'>解决方法</a></li>
             <li><a href="#content-comments">评论</a></li>
         </ol>
     </div>
@@ -160,7 +166,7 @@
 	</p>
 	<p>
 		©
-				2016
+				2014
 		<a class="niu2-footer-link" href="http://sdphome.github.io">Shao Depeng</a>
         / 			<a class="niu2-footer-link" href="/about.html" title="about me">关于</a>
         / 			<a class="niu2-footer-link" href="/agreement.html" title="terms, license and privacy etc.">协议</a>

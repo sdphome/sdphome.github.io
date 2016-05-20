@@ -122,4 +122,235 @@ get_device(hw_module_t *module, char const *name)
 }
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;函数返回的是&lt;code&gt;lcd_reflect_device_t&lt;/code&gt;结构的地址，在函数中首先定义&lt;code&gt;hw_device_t*device;&lt;/code&gt;接着将其通过&lt;code&gt;module-&amp;gt;methods-&amp;gt;open(module,name, &amp;amp;device);&lt;/code&gt;得到&lt;code&gt;hw_device_t&lt;/code&gt;这个结构的地址，接着将这个地址返回，返回前需要将地址类型强制转换一下，&lt;code&gt;(lcd_reflect_device_t*)device&lt;/code&gt;，这样就得到&lt;code&gt;lcd_reflect_device_t&lt;/code&gt;这个结构的地址啦。原因我们在上面讲过，是因为&lt;code&gt;hw_device_t&lt;/code&gt;和&lt;code&gt;lcd_reflect_device_t&lt;/code&gt;两个结构的首地址是相同的。&lt;/p&gt;
-&lt;p&gt;有了&lt;code&gt;lcd_reflect_device_t&lt;/code&gt;我们就可以调用hal层中实现的API啦，通过这些API操作硬件。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Mon, 21 May 2012 11:29:23 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-21:android/android_hal_call_and_achieve.html</guid><category>android</category><category>hal</category></item></channel></rss>
+&lt;p&gt;有了&lt;code&gt;lcd_reflect_device_t&lt;/code&gt;我们就可以调用hal层中实现的API啦，通过这些API操作硬件。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Mon, 21 May 2012 11:29:23 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-21:android/android_hal_call_and_achieve.html</guid><category>android</category><category>hal</category></item><item><title>oops的解读方法-----怎么通过oops查找源码行</title><link>http://sdphome.github.io/android/linux_oops_unscramble.html</link><description>&lt;p&gt;今天很郁闷的遇到了一个oops，以前碰到这类事情我就会退缩的，今天刚好没有任务，就想要不就分析一下，这个还是很重要的，我不能总是逃避这类问题啊，果断开始分析了。&lt;/p&gt;
+&lt;p&gt;先把oops亮出来给大伙看看。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[ 230.893864] Unable to handle kernel paging request at virtual address 
+9c0d5030
+[ 230.959592] pgd = 9aaf8000&lt;br/&gt;
+[ 230.962313] [9c0d5030] &lt;em&gt;pgd=aa003011, &lt;/em&gt;pte=00000000, *ppte=00000000&lt;br/&gt;
+[ 231.001197] Internal error: Oops: 7 [#1] PREEMPT&lt;br/&gt;
+[ 231.005821] last sysfs file: 
+/sys/devices/platform/wakeup_event-driver/wakeup_source&lt;br/&gt;
+[ 231.013571] Modules linked in: dhd(-)&lt;br/&gt;
+[ 231.017270] CPU: 0 Not tainted (2.6.35.3 #1)&lt;br/&gt;
+[ 231.022037] PC is at dhdsdio_htclk+0x28/0x438 [dhd]&lt;br/&gt;
+[ 231.026977] LR is at dhdsdio_clkctl+0x5c/0x108 [dhd]&lt;br/&gt;
+[ 231.031950] pc : [&amp;lt;7f012d84&amp;gt;] lr : [&amp;lt;7f013490&amp;gt;] psr: 20000013&lt;br/&gt;
+[ 231.031956] sp : 9ae41e30 ip : 00000000 fp : 2b3408f0 &lt;br/&gt;
+[ 231.043450] r10: 35c61ef0 r9 : 9ae40000 r8 : 00000001&lt;br/&gt;
+[ 231.048681] r7 : 00000000 r6 : 00000000 r5 : 9c096000 r4 : 9c09f000&lt;br/&gt;
+[ 231.055217] r3 : 00000000 r2 : 9c0d5000 r1 : 00004329 r0 : 9c09f000&lt;br/&gt;
+[ 231.061754] Flags: nzCv IRQs on FIQs on Mode SVC_32 ISA ARM Segment user&lt;br/&gt;
+[ 231.068898] Control: 10c5387d Table: aaaf8019 DAC: 00000015&lt;br/&gt;
+[ 231.074652] Process WifiService (pid: 2580, stack limit = 0x9ae402e8)&lt;br/&gt;
+[ 231.081100] Stack: (0x9ae41e30 to 0x9ae42000)&lt;br/&gt;
+[ 231.085468] 1e20: 9ae41eb4 803f17d0 20000093 80814e28&lt;br/&gt;
+[ 231.093659] 1e40: 94073900 80814e28 00000001 20000013 9c1dc714 
+9c09f000 00000003 00000000&lt;br/&gt;
+[ 231.101850] 1e60: 9c1dc03c 00000001 9ae40000 35c61ef0 2b3408f0 
+7f013490 9c09f000 00000000&lt;br/&gt;
+[ 231.110042] 1e80: 9ae636c0 7f0155b0 9c09f000 00000001 9ae41e68 
+00000000 9c1dc000 9c1dc0a8&lt;br/&gt;
+[ 231.118234] 1ea0: 9c1df000 9c1dc03c 8004c0c4 7f00142c 9c1dc000 
+7f00159c 9c09f000 9ae636c0&lt;br/&gt;
+[ 231.126426] 1ec0: 7f025240 67e04660 8004c0c4 7f014638 7f025228 
+9c093000 7f025240 7f01b24c&lt;br/&gt;
+[ 231.134617] 1ee0: 922df400 7f02337c 922df43c 802ebcd0 922df408 
+7f02337c 922df43c 802178b0&lt;br/&gt;
+[ 231.142809] 1f00: 922df408 7f02337c 922df43c 80217980 7f02337c 
+00000000 80846374 80216c24&lt;br/&gt;
+[ 231.151000] 1f20: 7f0233b0 00000000 9ae41f44 7f01b3d0 7f0233b0 
+7f01b5b0 7f0233b0 8009b1d4&lt;br/&gt;
+[ 231.159191] 1f40: 00000000 00646864 00000000 9ad9f8dc 00000001 
+39c2a6d3 00015e23 00000000&lt;br/&gt;
+[ 231.167382] 1f60: ffffffff 00000000 00000000 39dd6b48 00000003 
+00000003 39dd6c10 00000107&lt;br/&gt;
+[ 231.175573] 1f80: 7f0233b0 00000880 9ae41f8c 00000000 39dd6b48 
+ffffffff 67e04544 00000009&lt;br/&gt;
+[ 231.183764] 1fa0: 00000081 8004bf40 ffffffff 67e04544 67e04660 
+00000880 35c61f34 33d63f1c&lt;br/&gt;
+[ 231.191955] 1fc0: ffffffff 67e04544 00000009 00000081 39dd6b68 
+35c61f04 35c61ef0 2b3408f0&lt;br/&gt;
+[ 231.200147] 1fe0: 67e06288 39dd6b30 67e03f01 6fd0c44c 20000010 
+67e04660 7fff6d67 fdf7f39f&lt;br/&gt;
+[ 231.208458] [&amp;lt;7f012d84&amp;gt;] (dhdsdio_htclk+0x28/0x438 [dhd]) from [&amp;lt;7f013490&amp;gt;] (dhdsdio_clkctl+0x5c/0x108 [dhd])&lt;br/&gt;
+[ 231.218497] [&amp;lt;7f013490&amp;gt;] (dhdsdio_clkctl+0x5c/0x108 [dhd]) from [&amp;lt;7f0155b0&amp;gt;] (dhd_bus_stop+0x48/0x2ac [dhd])&lt;br/&gt;
+[ 231.228426] [&amp;lt;7f0155b0&amp;gt;] (dhd_bus_stop+0x48/0x2ac [dhd]) from [&amp;lt;7f00142c&amp;gt;] (dhd_bus_detach+0x2c/0x44 [dhd])&lt;br/&gt;
+[ 231.238242] [&amp;lt;7f00142c&amp;gt;] (dhd_bus_detach+0x2c/0x44 [dhd]) from [&amp;lt;7f00159c&amp;gt;] (dhd_detach+0x158/0x1c0 [dhd])&lt;br/&gt;
+[ 231.247993] [&amp;lt;7f00159c&amp;gt;] (dhd_detach+0x158/0x1c0 [dhd]) from [&amp;lt;7f014638&amp;gt;] (dhdsdio_release+0x40/0xcc [dhd])&lt;br/&gt;
+[ 231.257861] [&amp;lt;7f014638&amp;gt;] (dhdsdio_release+0x40/0xcc [dhd]) from [&amp;lt;7f01b24c&amp;gt;] (bcmsdh_remove+0x1c/0x8c [dhd])&lt;br/&gt;
+[ 231.267779] [&amp;lt;7f01b24c&amp;gt;] (bcmsdh_remove+0x1c/0x8c [dhd]) from [&amp;lt;802ebcd0&amp;gt;] (sdio_bus_remove+0x18/0x54)&lt;br/&gt;
+[ 231.277116] [&amp;lt;802ebcd0&amp;gt;] (sdio_bus_remove+0x18/0x54) from [&amp;lt;802178b0&amp;gt;] 
+(__device_release_driver+0x84/0xd0)&lt;br/&gt;
+[ 231.286790] [&amp;lt;802178b0&amp;gt;] (__device_release_driver+0x84/0xd0) from [&amp;lt;80217980&amp;gt;] (driver_detach+0x84/0xac)&lt;br/&gt;
+[ 231.296287] [&amp;lt;80217980&amp;gt;] (driver_detach+0x84/0xac) from [&amp;lt;80216c24&amp;gt;] 
+(bus_remove_driver+0x90/0xb8)&lt;br/&gt;
+[ 231.305324] [&amp;lt;80216c24&amp;gt;] (bus_remove_driver+0x90/0xb8) from [&amp;lt;7f01b3d0&amp;gt;] (sdio_function_cleanup+0xc/0x2c [dhd])&lt;br/&gt;
+[ 231.315522] [&amp;lt;7f01b3d0&amp;gt;] (sdio_function_cleanup+0xc/0x2c [dhd]) from [&amp;lt;7f01b5b0&amp;gt;] (dhd_module_cleanup+0x8/0x14 [dhd])&lt;br/&gt;
+[ 231.326140] unwind: Index not found 7f01b5b0&lt;br/&gt;
+[ 231.330421] Code: 0a0000d5 e5902008 e3041329 e5d031d8 (e5920030)&lt;br/&gt;
+[ 232.176926] ---[ end trace 23c706acef457857 ]---  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="72fa7c88b797342c8d89035066661dc5"&gt;分析&lt;/h2&gt;
+&lt;p&gt;从上面很明显的可以看出是一个dhd模块出错了，在我的这个板子上是一个wifi的驱动，
+这么一大串，吓到了。。。。&lt;/p&gt;
+&lt;p&gt;乍看是在dhdsdio_htclk这个函数中出错了，因为有这么一个片段的log啊&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;PC is at dhdsdio_htclk+0x28/0x438 [dhd]
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;此是pc的值是在dhdsdio_htclk这个函数的范围内(啥，，你不知道pc是啥玩意，，那这个就靠你自己去google一下啦)&lt;/p&gt;
+&lt;p&gt;下面我要做的事情就是要将这个函数所对应的c文件产生的.o文件反汇编一下，如下：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;./prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-objdump -D external/linux-bcm4329-wifi/src/dhd/linux/dhd-cdc-sdmmc-gpl-2.6.35/dhd_sdio.o &amp;gt; dhd_dump.text&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这样dhd_sdio.c的反汇编代码就保存在dhd_dump.txt里面(注：这个是android环境下的代码路径)啦，我们找到dhdsdio_htclk这个函数的所在位置(我只贴相关部分,还附带了我的注释,汇编的注释就是c啦，哈哈哈)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;00000124&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;dhdsdio_htclk&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;:&lt;/span&gt;
+     &lt;span class="nt"&gt;124&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e3510000&lt;/span&gt;    &lt;span class="nt"&gt;cmp&lt;/span&gt; &lt;span class="nt"&gt;r1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#0&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x0&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;r1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;on&lt;/span&gt;
+     &lt;span class="nt"&gt;128&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e92d4ff0&lt;/span&gt;    &lt;span class="nt"&gt;push&lt;/span&gt;    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;r4&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r5&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r6&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r7&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r8&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r9&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sl&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lr&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+     &lt;span class="nt"&gt;12c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e1a04000&lt;/span&gt;    &lt;span class="nt"&gt;mov&lt;/span&gt; &lt;span class="nt"&gt;r4&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;r0&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;r4&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus&lt;/span&gt;
+     &lt;span class="nt"&gt;130&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e24dd024&lt;/span&gt;    &lt;span class="nt"&gt;sub&lt;/span&gt; &lt;span class="nt"&gt;sp&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;sp&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#36&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x24&lt;/span&gt;
+     &lt;span class="nt"&gt;134&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e1a07002&lt;/span&gt;    &lt;span class="nt"&gt;mov&lt;/span&gt; &lt;span class="nt"&gt;r7&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;
+     &lt;span class="nt"&gt;138&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e5905004&lt;/span&gt;    &lt;span class="nt"&gt;ldr&lt;/span&gt; &lt;span class="nt"&gt;r5&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;r0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#4&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;sdh&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;sdh&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;r5&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;sdh&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ok&lt;/span&gt;
+     &lt;span class="nt"&gt;13c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;0a0000d5&lt;/span&gt;    &lt;span class="nt"&gt;beq&lt;/span&gt; &lt;span class="nt"&gt;498&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;dhdsdio_htclk&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;0x374&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;140&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e5902008&lt;/span&gt;    &lt;span class="nt"&gt;ldr&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;r0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#8&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;8&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;sih&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;sih&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ok&lt;/span&gt; &lt;span class="nt"&gt;sih&lt;/span&gt;&lt;span class="err"&gt;'&lt;/span&gt;&lt;span class="nt"&gt;s&lt;/span&gt; &lt;span class="nt"&gt;real&lt;/span&gt; &lt;span class="nt"&gt;address&lt;/span&gt;
+     &lt;span class="nt"&gt;144&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e3041329&lt;/span&gt;    &lt;span class="nt"&gt;movw&lt;/span&gt;    &lt;span class="nt"&gt;r1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#17193&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x4329&lt;/span&gt;        &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;ok&lt;/span&gt;
+     &lt;span class="nt"&gt;148&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e5d031d8&lt;/span&gt;    &lt;span class="nt"&gt;ldrb&lt;/span&gt;    &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;r0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#472&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;472&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;alp_only&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;r3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;clkreq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;alp_only&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+     &lt;span class="nt"&gt;14c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e5920030&lt;/span&gt;    &lt;span class="nt"&gt;ldr&lt;/span&gt; &lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;r2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#48&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;48&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;sih-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;chip&lt;/span&gt;    &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;XXXXXXX&lt;/span&gt;  &lt;span class="nt"&gt;NO&lt;/span&gt;
+     &lt;span class="nt"&gt;150&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e3530000&lt;/span&gt;    &lt;span class="nt"&gt;cmp&lt;/span&gt; &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#0&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x0&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;clkreq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;alp_only&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="nt"&gt;SBSDIO_ALP_AVAIL_REQ&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;SBSDIO_HT_AVAIL_REQ&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+     &lt;span class="nt"&gt;154&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;13a03008&lt;/span&gt;    &lt;span class="nt"&gt;movne&lt;/span&gt;   &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#8&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x8&lt;/span&gt;
+     &lt;span class="nt"&gt;158&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;03a03010&lt;/span&gt;    &lt;span class="nt"&gt;moveq&lt;/span&gt;   &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#16&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x10&lt;/span&gt;
+     &lt;span class="nt"&gt;15c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e1500001&lt;/span&gt;    &lt;span class="nt"&gt;cmp&lt;/span&gt; &lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;r1&lt;/span&gt;
+     &lt;span class="nt"&gt;160&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;1a000002&lt;/span&gt;    &lt;span class="nt"&gt;bne&lt;/span&gt; &lt;span class="nt"&gt;170&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;dhdsdio_htclk&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;0x4c&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;164&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e5922034&lt;/span&gt;    &lt;span class="nt"&gt;ldr&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;r2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#52&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;   &lt;span class="o"&gt;;;&lt;/span&gt;&lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;52&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;bus-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;sih-&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="nt"&gt;chiprev&lt;/span&gt;
+     &lt;span class="nt"&gt;168&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e3520000&lt;/span&gt;    &lt;span class="nt"&gt;cmp&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#0&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x0&lt;/span&gt;
+     &lt;span class="nt"&gt;16c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;03833001&lt;/span&gt;    &lt;span class="nt"&gt;orreq&lt;/span&gt;   &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#1&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x1&lt;/span&gt;   &lt;span class="o"&gt;;&lt;/span&gt;&lt;span class="nt"&gt;clkreq&lt;/span&gt; &lt;span class="o"&gt;|=&lt;/span&gt; &lt;span class="nt"&gt;SBSDIO_FORCE_ALP&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;r3&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nt"&gt;clkreq&lt;/span&gt;
+     &lt;span class="nt"&gt;170&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e1a00005&lt;/span&gt;    &lt;span class="nt"&gt;mov&lt;/span&gt; &lt;span class="nt"&gt;r0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;r5&lt;/span&gt;
+     &lt;span class="nt"&gt;174&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e3a01001&lt;/span&gt;    &lt;span class="nt"&gt;mov&lt;/span&gt; &lt;span class="nt"&gt;r1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#1&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x1&lt;/span&gt;
+     &lt;span class="nt"&gt;178&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e59f23a8&lt;/span&gt;    &lt;span class="nt"&gt;ldr&lt;/span&gt; &lt;span class="nt"&gt;r2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;pc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vi"&gt;#936&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;  &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;528&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;dhdsdio_htclk&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nt"&gt;0x404&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;17c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e28dc01c&lt;/span&gt;    &lt;span class="nt"&gt;add&lt;/span&gt; &lt;span class="nt"&gt;ip&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;sp&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;#28&lt;/span&gt; &lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="nt"&gt;0x1c&lt;/span&gt;
+     &lt;span class="nt"&gt;180&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;e58dc000&lt;/span&gt;    &lt;span class="nt"&gt;str&lt;/span&gt; &lt;span class="nt"&gt;ip&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;sp&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;
+     &lt;span class="nt"&gt;184&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;   &lt;span class="nt"&gt;ebfffffe&lt;/span&gt;    &lt;span class="nt"&gt;bl&lt;/span&gt;  &lt;span class="nt"&gt;0&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;bcmsdh_cfg_write&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+       &lt;span class="o"&gt;......(&lt;/span&gt;&lt;span class="err"&gt;后面省略一大段&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;下面再贴出c的代码啦，别急喔，&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;static&lt;/span&gt; &lt;span class="nt"&gt;int&lt;/span&gt;
+&lt;span class="nt"&gt;dhdsdio_htclk&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nt"&gt;dhd_bus_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nt"&gt;bus&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;bool&lt;/span&gt; &lt;span class="nt"&gt;on&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;bool&lt;/span&gt; &lt;span class="nt"&gt;pendok&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;int&lt;/span&gt; &lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;uint8&lt;/span&gt; &lt;span class="n"&gt;clkctl&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;clkreq&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;devctl&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;bcmsdh_info_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;sdh&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="n"&gt;DHD_TRACE&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s2"&gt;"%s: Enter\n"&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;__FUNCTION__&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+&lt;span class="m"&gt;#if&lt;/span&gt; &lt;span class="n"&gt;defined&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;OOB_INTR_ONLY&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;pendok&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="m"&gt;#endif&lt;/span&gt;
+    &lt;span class="n"&gt;clkctl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;sdh&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bus&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;sdh&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+
+    &lt;span class="n"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;on&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;
+        &lt;span class="c"&gt;/* Request HT Avail */&lt;/span&gt;
+        &lt;span class="n"&gt;clkreq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bus&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;alp_only&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="n"&gt;SBSDIO_ALP_AVAIL_REQ&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;SBSDIO_HT_AVAIL_REQ&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+        &lt;span class="n"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;bus&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;sih&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;chip&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;BCM4329_CHIP_ID&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bus&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;sih&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;chiprev&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+            &lt;span class="n"&gt;clkreq&lt;/span&gt; &lt;span class="o"&gt;|=&lt;/span&gt; &lt;span class="n"&gt;SBSDIO_FORCE_ALP&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+
+
+
+        &lt;span class="n"&gt;bcmsdh_cfg_write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sdh&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SDIO_FUNC_1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SBSDIO_FUNC1_CHIPCLKCSR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;clkreq&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;DHD_ERROR&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s2"&gt;"%s: HT Avail request error: %d\n"&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;__FUNCTION__&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+            &lt;span class="n"&gt;return&lt;/span&gt; &lt;span class="n"&gt;BCME_ERROR&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;........(&lt;/span&gt;&lt;span class="err"&gt;下面省略一大段&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;由&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;PC is at dhdsdio_htclk+0x28/0x438 [dhd]
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;可知问题出在 从dhdsdio_htclk+0x28的代码处，由反汇编代码知dhdsdio_htclk在124位置处，加上0x28的话，就是0x14c处，我们找到0x14c对应的汇编代码&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;14c:   e5920030    ldr r0, [r2, #48]   ;r0=r2+48=bus-&amp;gt;sih-&amp;gt;chip    ;XXXXXXX  NO  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;对于这段汇编代码，我在上面已经大概做出注释了，&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;140:   e5902008    ldr r2, [r0, #8]    ; r0+8=bus-&amp;gt;sih ; r2=bus-&amp;gt;sih   ;ok sih's real address  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;由上一行汇编得知r2保存的是bus-&amp;gt;sih的地址，r2偏移48那就是sih中的chip成员啦，可以给出sih的结构定义，如下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;typedef struct dhd_bus {
+    dhd_pub_t   *dhd;
+
+    bcmsdh_info_t   *sdh;           /* Handle for BCMSDH calls */
+    si_t        *sih;           /* Handle for SI calls */
+    char        *vars;          /* Variables (from CIS and/or other) */
+    ...... dhd_bus的定义，下面省略，只需关注sih这个成员变量
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;接着来看看sih的定义(即si_t)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;struct si_pub {
+    uint    socitype;
+
+    uint    bustype;     
+    uint    buscoretype;
+    uint    buscorerev; 
+    uint    buscoreidx;
+    int ccrev;       
+    uint32  cccaps;
+    int pmurev;       
+    uint32  pmucaps;
+    uint    boardtype;      
+    uint    boardvendor;
+    uint    boardflags;
+    uint    chip;
+&amp;amp;nbsp;   uint    chiprev;     
+    uint    chippkg; 
+    uint32  chipst;   
+    bool    issim;    
+    uint    socirev;   
+    bool    pci_pr32414;
+};
+
+#if defined(WLC_HIGH) &amp;amp;&amp;amp; !defined(WLC_LOW)
+typedef struct si_pub si_t;
+#else
+typedef const struct si_pub si_t;
+#endif
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这样就方便看汇编啦，
+从上面的分析可知，我们的代码是在读取r2+48(即r2+0x30)这个地址所对应的值，然后保存到r0中的时候出错的，&lt;/p&gt;
+&lt;p&gt;下面来验证我上面的分析。&lt;/p&gt;
+&lt;h2 id="cd8992b644e6c18367861a4d913fd116"&gt;验证&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[ 231.043450] r10: 35c61ef0 r9 : 9ae40000 r8 : 00000001&lt;br/&gt;
+[ 231.048681] r7 : 00000000 r6 : 00000000 r5 : 9c096000 r4 : 9c09f000&lt;br/&gt;
+[ 231.055217] r3 : 00000000 r2 : 9c0d5000 r1 : 00004329 r0 : 9c09f000  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;oops提供的信息中包含了各个寄存器的值，让我们来看看r2，r2=0x9c0d5000,
+那么r2+0x30=0x9c0d5030&lt;/p&gt;
+&lt;p&gt;好了，我们知道是在读取0x9c0d5030这个地址处的值,然后保存到r0的时候出现oops的，那么到底是读取的时候出错了，还是保存的时候出错了呢，&lt;/p&gt;
+&lt;p&gt;下面我们再来看一句可以验证我们想法的log信息，那就是oops的第一句，如下&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Unable to handle kernel paging request at virtual address 9c0d5030  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;注意看这个地址，，注意看最后的这个地址啊,,,,,,9c0d5030，哇，，好熟悉啊，不就是我们上面算出来的值么,,是在读取这个地址的值的时候出错的。。。瓦咔咔,,,分析出来了&lt;/p&gt;
+&lt;h2 id="9822c60db4d9f49c20ba67a188d5c86f"&gt;疑问&lt;/h2&gt;
+&lt;p&gt;上面好像一片和谐的景象啊，，结果有了，哈哈哈，可是不要高兴的太早喔，，结果是有了，可是该怎么解决呢，，毕竟我们分析问题的目的就是为了解决问题啊。。&lt;/p&gt;
+&lt;p&gt;单从该问题来说，我觉得可能是因为sih这个变量已经被deatch了，但是还没有验证，问题比较偶现，，唉，，最烦偶现的bug了，，&lt;/p&gt;
+&lt;p&gt;其实写这篇文章的目的也主要是为了讲述怎么从oops信息中去查找对应c代码中的错误行的，在linux内核调试中还是很有用的。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Unable to handle kernel paging request at virtual address &lt;pre class="cpp" name="code"&gt;9c0d5030  &lt;/pre&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;其实对于这句话我还是没有能够理解到底是怎么了，怎么会出现这种错误，&lt;/p&gt;
+&lt;p&gt;如果哪位朋友对这个比较了解的话，希望能不吝赐教，多多回帖帮我解惑，再此先感谢了。&lt;/p&gt;
+&lt;hr/&gt;
+&lt;p&gt;ps: 解答上面的问题&lt;/p&gt;
+&lt;h2 id="f574c1735434fbe9498b74b6967b14d8"&gt;解答&lt;/h2&gt;
+&lt;p&gt;不能访问的内核虚地址为45685516，内核中一般可访问的地址都是以0xCXXXXXXX开头的地址。&lt;/p&gt;
+&lt;p&gt;Oops: 0002 [#1]&lt;/p&gt;
+&lt;p&gt;这里面，0002表示Oops的错误代码（写错误，发生在内核空间），#1表示这个错误发生一次。&lt;/p&gt;
+&lt;p&gt;Oops的错误代码根据错误的原因会有不同的定义，本文中的例子可以参考下面的定义（如果发现自己遇到的Oops和下面无法对应的话，最好去内核代码里查找）：&lt;/p&gt;
+&lt;p&gt;error_code:
+&lt;em&gt; bit 0 == 0 means no page found, 1 means protection fault
+&lt;/em&gt; bit 1 == 0 means read, 1 means write
+&lt;em&gt; bit 2 == 0 means kernel, 1 means user-mode
+&lt;/em&gt; bit 3 == 0 means data, 1 means instruction&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Fri, 18 May 2012 15:50:12 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-18:android/linux_oops_unscramble.html</guid><category>汇编，oops，crash，linux</category></item></channel></rss>

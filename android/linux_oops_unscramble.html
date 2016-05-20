@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>oops的解读方法-----怎么通过oops查找源码行 - SDP日常笔记</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
+    <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
+
+    <link rel="canonical" href="http://sdphome.github.io/android/linux_oops_unscramble.html" />
+    
+    <script type="text/javascript">window.onload=function(){};</script>
+    <!--[if lt IE 9]>
+        <script src="http://sdphome.github.io/theme/js/html5shiv.js"></script>
+        <script src="http://sdphome.github.io/theme/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body> 
+    <div id="body-header">
+<div class="navbar navbar-inverse navbar-fixed-top">
+<div class="col-md-12">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://sdphome.github.io">
+            <i class="fa fa-home"></i>SDP日常笔记
+        </a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+            <li><a href="/about.html" title="about me">
+                <i class="fa fa-anchor"></i>关于</a>
+            </li>
+            <li><a href="/agreement.html" title="agreement">
+                <i class="fa fa-info-circle"></i>使用协议</a>
+            </li>
+            <li><a href="/tag/" title="tags">
+                <i class="fa fa-tag"></i>标签</a>
+            </li>
+        <!-- category dropdown list -->
+        <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-folder-open"></i>分类<b class="caret"></b>
+           </a>
+           <ul class="dropdown-menu">
+               <li><a href="http://sdphome.github.io/android/index.html">
+                      <i class="fa fa-android"></i>android/kernel
+                      (2)</a></li>
+               <li><a href="http://sdphome.github.io/ubuntu/index.html">
+                      <i class="fa fa-linux"></i>ubuntu
+                      (1)</a></li>
+           </ul>
+        </li>
+        <!--  self defined dropdown list -->
+        <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               <i class="fa fa-archive"></i>存档<b class="caret"></b>
+           </a>
+           <ul class="dropdown-menu">
+               <li><a href="/archives.html" title="archives order by publish time">
+                 <i class="fa fa-calendar"></i>存档 (按发布时间)</a>
+               </li>
+               <li><a href="/archives_updatedate.html" title="archives order by modify time">
+                 <i class="fa fa-pencil"></i>存档 (按修改时间)</a>
+               </li>
+           </ul>
+        </li>
+        </ul>
+        
+        <!-- right nav bar -->
+        <ul class="nav navbar-nav navbar-right">
+        <!-- google custom search -->
+        <li>
+        <div id="niu2-cse-wrapper">
+            <div id="niu2-cse-header-box" class="navbar-form navbar-nav">
+                <form action="http://google.com/cse">
+                    <input type="hidden" name="cx" value="016153735682458819581:d-c6xpkcmcy" />
+                    <input type="hidden" name="ie" value="UTF-8" />
+                    <div class="form-group">
+                        <input id="niu2-cse-search-input" class="niu2-cse-header form-control" 
+                            type="text" name="q" 
+                            placeholder="按回车开始搜索 ..."/>
+                    </div>
+                </form>
+           </div>
+           <div id="niu2-cse-ctrl-box" class="navbar-nav">
+            <i id="niu2-cse-search-image" class="fa fa-search navbar-nav"></i><span id="niu2-cse-search-text">搜索</span>
+           </div>
+       </div>
+       </li>
+       </ul>
+    </nav>
+</div>
+</div>    </div>
+    
+    <div id="body-content">
+<div class="col-md-8 col-md-offset-2">
+    <h1 id="content-heading">oops的解读方法-----怎么通过oops查找源码行</h1>
+</div>
+<div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
+    <div id="niu2-main-content">
+        <p>今天很郁闷的遇到了一个oops，以前碰到这类事情我就会退缩的，今天刚好没有任务，就想要不就分析一下，这个还是很重要的，我不能总是逃避这类问题啊，果断开始分析了。</p>
+<p>先把oops亮出来给大伙看看。</p>
+<blockquote>
+<p>[ 230.893864] Unable to handle kernel paging request at virtual address 
+9c0d5030
+[ 230.959592] pgd = 9aaf8000<br/>
+[ 230.962313] [9c0d5030] <em>pgd=aa003011, </em>pte=00000000, *ppte=00000000<br/>
+[ 231.001197] Internal error: Oops: 7 [#1] PREEMPT<br/>
+[ 231.005821] last sysfs file: 
+/sys/devices/platform/wakeup_event-driver/wakeup_source<br/>
+[ 231.013571] Modules linked in: dhd(-)<br/>
+[ 231.017270] CPU: 0 Not tainted (2.6.35.3 #1)<br/>
+[ 231.022037] PC is at dhdsdio_htclk+0x28/0x438 [dhd]<br/>
+[ 231.026977] LR is at dhdsdio_clkctl+0x5c/0x108 [dhd]<br/>
+[ 231.031950] pc : [&lt;7f012d84&gt;] lr : [&lt;7f013490&gt;] psr: 20000013<br/>
+[ 231.031956] sp : 9ae41e30 ip : 00000000 fp : 2b3408f0 <br/>
+[ 231.043450] r10: 35c61ef0 r9 : 9ae40000 r8 : 00000001<br/>
+[ 231.048681] r7 : 00000000 r6 : 00000000 r5 : 9c096000 r4 : 9c09f000<br/>
+[ 231.055217] r3 : 00000000 r2 : 9c0d5000 r1 : 00004329 r0 : 9c09f000<br/>
+[ 231.061754] Flags: nzCv IRQs on FIQs on Mode SVC_32 ISA ARM Segment user<br/>
+[ 231.068898] Control: 10c5387d Table: aaaf8019 DAC: 00000015<br/>
+[ 231.074652] Process WifiService (pid: 2580, stack limit = 0x9ae402e8)<br/>
+[ 231.081100] Stack: (0x9ae41e30 to 0x9ae42000)<br/>
+[ 231.085468] 1e20: 9ae41eb4 803f17d0 20000093 80814e28<br/>
+[ 231.093659] 1e40: 94073900 80814e28 00000001 20000013 9c1dc714 
+9c09f000 00000003 00000000<br/>
+[ 231.101850] 1e60: 9c1dc03c 00000001 9ae40000 35c61ef0 2b3408f0 
+7f013490 9c09f000 00000000<br/>
+[ 231.110042] 1e80: 9ae636c0 7f0155b0 9c09f000 00000001 9ae41e68 
+00000000 9c1dc000 9c1dc0a8<br/>
+[ 231.118234] 1ea0: 9c1df000 9c1dc03c 8004c0c4 7f00142c 9c1dc000 
+7f00159c 9c09f000 9ae636c0<br/>
+[ 231.126426] 1ec0: 7f025240 67e04660 8004c0c4 7f014638 7f025228 
+9c093000 7f025240 7f01b24c<br/>
+[ 231.134617] 1ee0: 922df400 7f02337c 922df43c 802ebcd0 922df408 
+7f02337c 922df43c 802178b0<br/>
+[ 231.142809] 1f00: 922df408 7f02337c 922df43c 80217980 7f02337c 
+00000000 80846374 80216c24<br/>
+[ 231.151000] 1f20: 7f0233b0 00000000 9ae41f44 7f01b3d0 7f0233b0 
+7f01b5b0 7f0233b0 8009b1d4<br/>
+[ 231.159191] 1f40: 00000000 00646864 00000000 9ad9f8dc 00000001 
+39c2a6d3 00015e23 00000000<br/>
+[ 231.167382] 1f60: ffffffff 00000000 00000000 39dd6b48 00000003 
+00000003 39dd6c10 00000107<br/>
+[ 231.175573] 1f80: 7f0233b0 00000880 9ae41f8c 00000000 39dd6b48 
+ffffffff 67e04544 00000009<br/>
+[ 231.183764] 1fa0: 00000081 8004bf40 ffffffff 67e04544 67e04660 
+00000880 35c61f34 33d63f1c<br/>
+[ 231.191955] 1fc0: ffffffff 67e04544 00000009 00000081 39dd6b68 
+35c61f04 35c61ef0 2b3408f0<br/>
+[ 231.200147] 1fe0: 67e06288 39dd6b30 67e03f01 6fd0c44c 20000010 
+67e04660 7fff6d67 fdf7f39f<br/>
+[ 231.208458] [&lt;7f012d84&gt;] (dhdsdio_htclk+0x28/0x438 [dhd]) from [&lt;7f013490&gt;] (dhdsdio_clkctl+0x5c/0x108 [dhd])<br/>
+[ 231.218497] [&lt;7f013490&gt;] (dhdsdio_clkctl+0x5c/0x108 [dhd]) from [&lt;7f0155b0&gt;] (dhd_bus_stop+0x48/0x2ac [dhd])<br/>
+[ 231.228426] [&lt;7f0155b0&gt;] (dhd_bus_stop+0x48/0x2ac [dhd]) from [&lt;7f00142c&gt;] (dhd_bus_detach+0x2c/0x44 [dhd])<br/>
+[ 231.238242] [&lt;7f00142c&gt;] (dhd_bus_detach+0x2c/0x44 [dhd]) from [&lt;7f00159c&gt;] (dhd_detach+0x158/0x1c0 [dhd])<br/>
+[ 231.247993] [&lt;7f00159c&gt;] (dhd_detach+0x158/0x1c0 [dhd]) from [&lt;7f014638&gt;] (dhdsdio_release+0x40/0xcc [dhd])<br/>
+[ 231.257861] [&lt;7f014638&gt;] (dhdsdio_release+0x40/0xcc [dhd]) from [&lt;7f01b24c&gt;] (bcmsdh_remove+0x1c/0x8c [dhd])<br/>
+[ 231.267779] [&lt;7f01b24c&gt;] (bcmsdh_remove+0x1c/0x8c [dhd]) from [&lt;802ebcd0&gt;] (sdio_bus_remove+0x18/0x54)<br/>
+[ 231.277116] [&lt;802ebcd0&gt;] (sdio_bus_remove+0x18/0x54) from [&lt;802178b0&gt;] 
+(__device_release_driver+0x84/0xd0)<br/>
+[ 231.286790] [&lt;802178b0&gt;] (__device_release_driver+0x84/0xd0) from [&lt;80217980&gt;] (driver_detach+0x84/0xac)<br/>
+[ 231.296287] [&lt;80217980&gt;] (driver_detach+0x84/0xac) from [&lt;80216c24&gt;] 
+(bus_remove_driver+0x90/0xb8)<br/>
+[ 231.305324] [&lt;80216c24&gt;] (bus_remove_driver+0x90/0xb8) from [&lt;7f01b3d0&gt;] (sdio_function_cleanup+0xc/0x2c [dhd])<br/>
+[ 231.315522] [&lt;7f01b3d0&gt;] (sdio_function_cleanup+0xc/0x2c [dhd]) from [&lt;7f01b5b0&gt;] (dhd_module_cleanup+0x8/0x14 [dhd])<br/>
+[ 231.326140] unwind: Index not found 7f01b5b0<br/>
+[ 231.330421] Code: 0a0000d5 e5902008 e3041329 e5d031d8 (e5920030)<br/>
+[ 232.176926] ---[ end trace 23c706acef457857 ]---  </p>
+</blockquote>
+<h2 id="72fa7c88b797342c8d89035066661dc5">分析</h2>
+<p>从上面很明显的可以看出是一个dhd模块出错了，在我的这个板子上是一个wifi的驱动，
+这么一大串，吓到了。。。。</p>
+<p>乍看是在dhdsdio_htclk这个函数中出错了，因为有这么一个片段的log啊</p>
+<div class="highlight"><pre><span></span>PC is at dhdsdio_htclk+0x28/0x438 [dhd]
+</pre></div>
+<p>此是pc的值是在dhdsdio_htclk这个函数的范围内(啥，，你不知道pc是啥玩意，，那这个就靠你自己去google一下啦)</p>
+<p>下面我要做的事情就是要将这个函数所对应的c文件产生的.o文件反汇编一下，如下：</p>
+<blockquote>
+<p>./prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-objdump -D external/linux-bcm4329-wifi/src/dhd/linux/dhd-cdc-sdmmc-gpl-2.6.35/dhd_sdio.o &gt; dhd_dump.text</p>
+</blockquote>
+<p>这样dhd_sdio.c的反汇编代码就保存在dhd_dump.txt里面(注：这个是android环境下的代码路径)啦，我们找到dhdsdio_htclk这个函数的所在位置(我只贴相关部分,还附带了我的注释,汇编的注释就是c啦，哈哈哈)</p>
+<div class="highlight"><pre><span></span><span class="nt">00000124</span> <span class="o">&lt;</span><span class="nt">dhdsdio_htclk</span><span class="o">&gt;:</span>
+     <span class="nt">124</span><span class="o">:</span>   <span class="nt">e3510000</span>    <span class="nt">cmp</span> <span class="nt">r1</span><span class="o">,</span> <span class="nn">#0</span>  <span class="o">;</span> <span class="nt">0x0</span>   <span class="o">;</span><span class="nt">r1</span><span class="o">=</span><span class="nt">on</span>
+     <span class="nt">128</span><span class="o">:</span>   <span class="nt">e92d4ff0</span>    <span class="nt">push</span>    <span class="p">{</span><span class="n">r4</span><span class="o">,</span> <span class="n">r5</span><span class="o">,</span> <span class="n">r6</span><span class="o">,</span> <span class="n">r7</span><span class="o">,</span> <span class="n">r8</span><span class="o">,</span> <span class="n">r9</span><span class="o">,</span> <span class="n">sl</span><span class="o">,</span> <span class="n">fp</span><span class="o">,</span> <span class="n">lr</span><span class="p">}</span>
+     <span class="nt">12c</span><span class="o">:</span>   <span class="nt">e1a04000</span>    <span class="nt">mov</span> <span class="nt">r4</span><span class="o">,</span> <span class="nt">r0</span>  <span class="o">;</span><span class="nt">r4</span><span class="o">=</span><span class="nt">r0</span><span class="o">=</span><span class="nt">bus</span>
+     <span class="nt">130</span><span class="o">:</span>   <span class="nt">e24dd024</span>    <span class="nt">sub</span> <span class="nt">sp</span><span class="o">,</span> <span class="nt">sp</span><span class="o">,</span> <span class="nn">#36</span> <span class="o">;</span> <span class="nt">0x24</span>
+     <span class="nt">134</span><span class="o">:</span>   <span class="nt">e1a07002</span>    <span class="nt">mov</span> <span class="nt">r7</span><span class="o">,</span> <span class="nt">r2</span>
+     <span class="nt">138</span><span class="o">:</span>   <span class="nt">e5905004</span>    <span class="nt">ldr</span> <span class="nt">r5</span><span class="o">,</span> <span class="cp">[</span><span class="nx">r0</span><span class="p">,</span> <span class="vi">#4</span><span class="cp">]</span>    <span class="o">;</span> <span class="nt">sdh</span> <span class="o">=</span> <span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">sdh</span><span class="o">;</span> <span class="nt">r5</span><span class="o">=</span><span class="nt">sdh</span>    <span class="o">;</span><span class="nt">ok</span>
+     <span class="nt">13c</span><span class="o">:</span>   <span class="nt">0a0000d5</span>    <span class="nt">beq</span> <span class="nt">498</span> <span class="o">&lt;</span><span class="nt">dhdsdio_htclk</span><span class="o">+</span><span class="nt">0x374</span><span class="o">&gt;</span>
+     <span class="nt">140</span><span class="o">:</span>   <span class="nt">e5902008</span>    <span class="nt">ldr</span> <span class="nt">r2</span><span class="o">,</span> <span class="cp">[</span><span class="nx">r0</span><span class="p">,</span> <span class="vi">#8</span><span class="cp">]</span>    <span class="o">;</span> <span class="nt">r0</span><span class="o">+</span><span class="nt">8</span><span class="o">=</span><span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">sih</span> <span class="o">;</span> <span class="nt">r2</span><span class="o">=</span><span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">sih</span>   <span class="o">;</span><span class="nt">ok</span> <span class="nt">sih</span><span class="err">'</span><span class="nt">s</span> <span class="nt">real</span> <span class="nt">address</span>
+     <span class="nt">144</span><span class="o">:</span>   <span class="nt">e3041329</span>    <span class="nt">movw</span>    <span class="nt">r1</span><span class="o">,</span> <span class="nn">#17193</span>  <span class="o">;</span> <span class="nt">0x4329</span>        <span class="o">;</span><span class="nt">ok</span>
+     <span class="nt">148</span><span class="o">:</span>   <span class="nt">e5d031d8</span>    <span class="nt">ldrb</span>    <span class="nt">r3</span><span class="o">,</span> <span class="cp">[</span><span class="nx">r0</span><span class="p">,</span> <span class="vi">#472</span><span class="cp">]</span>  <span class="o">;</span><span class="nt">r3</span><span class="o">=</span><span class="nt">r0</span><span class="o">+</span><span class="nt">472</span><span class="o">=</span><span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">alp_only</span> <span class="o">;</span> <span class="nt">r3</span> <span class="o">=</span> <span class="nt">clkreq</span> <span class="o">=</span> <span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">alp_only</span> <span class="o">=</span> <span class="nt">0</span><span class="o">;</span>
+     <span class="nt">14c</span><span class="o">:</span>   <span class="nt">e5920030</span>    <span class="nt">ldr</span> <span class="nt">r0</span><span class="o">,</span> <span class="cp">[</span><span class="nx">r2</span><span class="p">,</span> <span class="vi">#48</span><span class="cp">]</span>   <span class="o">;</span><span class="nt">r0</span><span class="o">=</span><span class="nt">r2</span><span class="o">+</span><span class="nt">48</span><span class="o">=</span><span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">sih-</span><span class="o">&gt;</span><span class="nt">chip</span>    <span class="o">;</span><span class="nt">XXXXXXX</span>  <span class="nt">NO</span>
+     <span class="nt">150</span><span class="o">:</span>   <span class="nt">e3530000</span>    <span class="nt">cmp</span> <span class="nt">r3</span><span class="o">,</span> <span class="nn">#0</span>  <span class="o">;</span> <span class="nt">0x0</span>   <span class="o">;</span><span class="nt">clkreq</span> <span class="o">=</span> <span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">alp_only</span> <span class="o">?</span> <span class="nt">SBSDIO_ALP_AVAIL_REQ</span> <span class="o">:</span> <span class="nt">SBSDIO_HT_AVAIL_REQ</span><span class="o">;</span>
+     <span class="nt">154</span><span class="o">:</span>   <span class="nt">13a03008</span>    <span class="nt">movne</span>   <span class="nt">r3</span><span class="o">,</span> <span class="nn">#8</span>  <span class="o">;</span> <span class="nt">0x8</span>
+     <span class="nt">158</span><span class="o">:</span>   <span class="nt">03a03010</span>    <span class="nt">moveq</span>   <span class="nt">r3</span><span class="o">,</span> <span class="nn">#16</span> <span class="o">;</span> <span class="nt">0x10</span>
+     <span class="nt">15c</span><span class="o">:</span>   <span class="nt">e1500001</span>    <span class="nt">cmp</span> <span class="nt">r0</span><span class="o">,</span> <span class="nt">r1</span>
+     <span class="nt">160</span><span class="o">:</span>   <span class="nt">1a000002</span>    <span class="nt">bne</span> <span class="nt">170</span> <span class="o">&lt;</span><span class="nt">dhdsdio_htclk</span><span class="o">+</span><span class="nt">0x4c</span><span class="o">&gt;</span>
+     <span class="nt">164</span><span class="o">:</span>   <span class="nt">e5922034</span>    <span class="nt">ldr</span> <span class="nt">r2</span><span class="o">,</span> <span class="cp">[</span><span class="nx">r2</span><span class="p">,</span> <span class="vi">#52</span><span class="cp">]</span>   <span class="o">;;</span><span class="nt">r2</span><span class="o">+</span><span class="nt">52</span><span class="o">=</span><span class="nt">bus-</span><span class="o">&gt;</span><span class="nt">sih-</span><span class="o">&gt;</span><span class="nt">chiprev</span>
+     <span class="nt">168</span><span class="o">:</span>   <span class="nt">e3520000</span>    <span class="nt">cmp</span> <span class="nt">r2</span><span class="o">,</span> <span class="nn">#0</span>  <span class="o">;</span> <span class="nt">0x0</span>
+     <span class="nt">16c</span><span class="o">:</span>   <span class="nt">03833001</span>    <span class="nt">orreq</span>   <span class="nt">r3</span><span class="o">,</span> <span class="nt">r3</span><span class="o">,</span> <span class="nn">#1</span>  <span class="o">;</span> <span class="nt">0x1</span>   <span class="o">;</span><span class="nt">clkreq</span> <span class="o">|=</span> <span class="nt">SBSDIO_FORCE_ALP</span><span class="o">;</span> <span class="nt">r3</span><span class="o">=</span><span class="nt">clkreq</span>
+     <span class="nt">170</span><span class="o">:</span>   <span class="nt">e1a00005</span>    <span class="nt">mov</span> <span class="nt">r0</span><span class="o">,</span> <span class="nt">r5</span>
+     <span class="nt">174</span><span class="o">:</span>   <span class="nt">e3a01001</span>    <span class="nt">mov</span> <span class="nt">r1</span><span class="o">,</span> <span class="nn">#1</span>  <span class="o">;</span> <span class="nt">0x1</span>
+     <span class="nt">178</span><span class="o">:</span>   <span class="nt">e59f23a8</span>    <span class="nt">ldr</span> <span class="nt">r2</span><span class="o">,</span> <span class="cp">[</span><span class="nx">pc</span><span class="p">,</span> <span class="vi">#936</span><span class="cp">]</span>  <span class="o">;</span> <span class="nt">528</span> <span class="o">&lt;</span><span class="nt">dhdsdio_htclk</span><span class="o">+</span><span class="nt">0x404</span><span class="o">&gt;</span>
+     <span class="nt">17c</span><span class="o">:</span>   <span class="nt">e28dc01c</span>    <span class="nt">add</span> <span class="nt">ip</span><span class="o">,</span> <span class="nt">sp</span><span class="o">,</span> <span class="nn">#28</span> <span class="o">;</span> <span class="nt">0x1c</span>
+     <span class="nt">180</span><span class="o">:</span>   <span class="nt">e58dc000</span>    <span class="nt">str</span> <span class="nt">ip</span><span class="o">,</span> <span class="cp">[</span><span class="nx">sp</span><span class="cp">]</span>
+     <span class="nt">184</span><span class="o">:</span>   <span class="nt">ebfffffe</span>    <span class="nt">bl</span>  <span class="nt">0</span> <span class="o">&lt;</span><span class="nt">bcmsdh_cfg_write</span><span class="o">&gt;</span>
+       <span class="o">......(</span><span class="err">后面省略一大段</span><span class="o">)</span>
+</pre></div>
+<p>下面再贴出c的代码啦，别急喔，</p>
+<div class="highlight"><pre><span></span><span class="nt">static</span> <span class="nt">int</span>
+<span class="nt">dhdsdio_htclk</span><span class="o">(</span><span class="nt">dhd_bus_t</span> <span class="o">*</span><span class="nt">bus</span><span class="o">,</span> <span class="nt">bool</span> <span class="nt">on</span><span class="o">,</span> <span class="nt">bool</span> <span class="nt">pendok</span><span class="o">)</span>
+<span class="p">{</span>
+    <span class="n">int</span> <span class="n">err</span><span class="p">;</span>
+    <span class="n">uint8</span> <span class="n">clkctl</span><span class="o">,</span> <span class="n">clkreq</span><span class="o">,</span> <span class="n">devctl</span><span class="p">;</span>
+    <span class="n">bcmsdh_info_t</span> <span class="o">*</span><span class="n">sdh</span><span class="p">;</span>
+
+    <span class="n">DHD_TRACE</span><span class="p">((</span><span class="s2">"%s: Enter\n"</span><span class="o">,</span> <span class="n">__FUNCTION__</span><span class="p">));</span>
+
+<span class="m">#if</span> <span class="n">defined</span><span class="p">(</span><span class="n">OOB_INTR_ONLY</span><span class="p">)</span>
+    <span class="n">pendok</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="m">#endif</span>
+    <span class="n">clkctl</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
+    <span class="n">sdh</span> <span class="o">=</span> <span class="n">bus</span><span class="o">-&gt;</span><span class="n">sdh</span><span class="p">;</span>
+
+
+    <span class="n">if</span> <span class="p">(</span><span class="n">on</span><span class="p">)</span> <span class="err">{</span>
+        <span class="c">/* Request HT Avail */</span>
+        <span class="n">clkreq</span> <span class="o">=</span> <span class="n">bus</span><span class="o">-&gt;</span><span class="n">alp_only</span> <span class="o">?</span> <span class="n">SBSDIO_ALP_AVAIL_REQ</span> <span class="o">:</span> <span class="n">SBSDIO_HT_AVAIL_REQ</span><span class="p">;</span>
+
+        <span class="n">if</span> <span class="p">((</span><span class="n">bus</span><span class="o">-&gt;</span><span class="n">sih</span><span class="o">-&gt;</span><span class="n">chip</span> <span class="o">==</span> <span class="n">BCM4329_CHIP_ID</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">bus</span><span class="o">-&gt;</span><span class="n">sih</span><span class="o">-&gt;</span><span class="n">chiprev</span> <span class="o">==</span> <span class="m">0</span><span class="p">))</span>
+            <span class="n">clkreq</span> <span class="o">|=</span> <span class="n">SBSDIO_FORCE_ALP</span><span class="p">;</span>
+
+
+
+
+        <span class="n">bcmsdh_cfg_write</span><span class="p">(</span><span class="n">sdh</span><span class="o">,</span> <span class="n">SDIO_FUNC_1</span><span class="o">,</span> <span class="n">SBSDIO_FUNC1_CHIPCLKCSR</span><span class="o">,</span> <span class="n">clkreq</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">err</span><span class="p">);</span>
+        <span class="n">if</span> <span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">DHD_ERROR</span><span class="p">((</span><span class="s2">"%s: HT Avail request error: %d\n"</span><span class="o">,</span> <span class="n">__FUNCTION__</span><span class="o">,</span> <span class="n">err</span><span class="p">));</span>
+            <span class="n">return</span> <span class="n">BCME_ERROR</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="o">........(</span><span class="err">下面省略一大段</span><span class="o">)</span>
+</pre></div>
+<p>由</p>
+<div class="highlight"><pre><span></span>PC is at dhdsdio_htclk+0x28/0x438 [dhd]
+</pre></div>
+<p>可知问题出在 从dhdsdio_htclk+0x28的代码处，由反汇编代码知dhdsdio_htclk在124位置处，加上0x28的话，就是0x14c处，我们找到0x14c对应的汇编代码</p>
+<blockquote>
+<p>14c:   e5920030    ldr r0, [r2, #48]   ;r0=r2+48=bus-&gt;sih-&gt;chip    ;XXXXXXX  NO  </p>
+</blockquote>
+<p>对于这段汇编代码，我在上面已经大概做出注释了，</p>
+<blockquote>
+<p>140:   e5902008    ldr r2, [r0, #8]    ; r0+8=bus-&gt;sih ; r2=bus-&gt;sih   ;ok sih's real address  </p>
+</blockquote>
+<p>由上一行汇编得知r2保存的是bus-&gt;sih的地址，r2偏移48那就是sih中的chip成员啦，可以给出sih的结构定义，如下</p>
+<div class="highlight"><pre><span></span>typedef struct dhd_bus {
+    dhd_pub_t   *dhd;
+
+    bcmsdh_info_t   *sdh;           /* Handle for BCMSDH calls */
+    si_t        *sih;           /* Handle for SI calls */
+    char        *vars;          /* Variables (from CIS and/or other) */
+    ...... dhd_bus的定义，下面省略，只需关注sih这个成员变量
+</pre></div>
+<p>接着来看看sih的定义(即si_t)</p>
+<div class="highlight"><pre><span></span>struct si_pub {
+    uint    socitype;
+
+    uint    bustype;     
+    uint    buscoretype;
+    uint    buscorerev; 
+    uint    buscoreidx;
+    int ccrev;       
+    uint32  cccaps;
+    int pmurev;       
+    uint32  pmucaps;
+    uint    boardtype;      
+    uint    boardvendor;
+    uint    boardflags;
+    uint    chip;
+&amp;nbsp;   uint    chiprev;     
+    uint    chippkg; 
+    uint32  chipst;   
+    bool    issim;    
+    uint    socirev;   
+    bool    pci_pr32414;
+};
+
+#if defined(WLC_HIGH) &amp;&amp; !defined(WLC_LOW)
+typedef struct si_pub si_t;
+#else
+typedef const struct si_pub si_t;
+#endif
+</pre></div>
+<p>这样就方便看汇编啦，
+从上面的分析可知，我们的代码是在读取r2+48(即r2+0x30)这个地址所对应的值，然后保存到r0中的时候出错的，</p>
+<p>下面来验证我上面的分析。</p>
+<h2 id="cd8992b644e6c18367861a4d913fd116">验证</h2>
+<blockquote>
+<p>[ 231.043450] r10: 35c61ef0 r9 : 9ae40000 r8 : 00000001<br/>
+[ 231.048681] r7 : 00000000 r6 : 00000000 r5 : 9c096000 r4 : 9c09f000<br/>
+[ 231.055217] r3 : 00000000 r2 : 9c0d5000 r1 : 00004329 r0 : 9c09f000  </p>
+</blockquote>
+<p>oops提供的信息中包含了各个寄存器的值，让我们来看看r2，r2=0x9c0d5000,
+那么r2+0x30=0x9c0d5030</p>
+<p>好了，我们知道是在读取0x9c0d5030这个地址处的值,然后保存到r0的时候出现oops的，那么到底是读取的时候出错了，还是保存的时候出错了呢，</p>
+<p>下面我们再来看一句可以验证我们想法的log信息，那就是oops的第一句，如下</p>
+<blockquote>
+<p>Unable to handle kernel paging request at virtual address 9c0d5030  </p>
+</blockquote>
+<p>注意看这个地址，，注意看最后的这个地址啊,,,,,,9c0d5030，哇，，好熟悉啊，不就是我们上面算出来的值么,,是在读取这个地址的值的时候出错的。。。瓦咔咔,,,分析出来了</p>
+<h2 id="9822c60db4d9f49c20ba67a188d5c86f">疑问</h2>
+<p>上面好像一片和谐的景象啊，，结果有了，哈哈哈，可是不要高兴的太早喔，，结果是有了，可是该怎么解决呢，，毕竟我们分析问题的目的就是为了解决问题啊。。</p>
+<p>单从该问题来说，我觉得可能是因为sih这个变量已经被deatch了，但是还没有验证，问题比较偶现，，唉，，最烦偶现的bug了，，</p>
+<p>其实写这篇文章的目的也主要是为了讲述怎么从oops信息中去查找对应c代码中的错误行的，在linux内核调试中还是很有用的。</p>
+<blockquote>
+<p>Unable to handle kernel paging request at virtual address <pre class="cpp" name="code">9c0d5030  </pre></p>
+</blockquote>
+<p>其实对于这句话我还是没有能够理解到底是怎么了，怎么会出现这种错误，</p>
+<p>如果哪位朋友对这个比较了解的话，希望能不吝赐教，多多回帖帮我解惑，再此先感谢了。</p>
+<hr/>
+<p>ps: 解答上面的问题</p>
+<h2 id="f574c1735434fbe9498b74b6967b14d8">解答</h2>
+<p>不能访问的内核虚地址为45685516，内核中一般可访问的地址都是以0xCXXXXXXX开头的地址。</p>
+<p>Oops: 0002 [#1]</p>
+<p>这里面，0002表示Oops的错误代码（写错误，发生在内核空间），#1表示这个错误发生一次。</p>
+<p>Oops的错误代码根据错误的原因会有不同的定义，本文中的例子可以参考下面的定义（如果发现自己遇到的Oops和下面无法对应的话，最好去内核代码里查找）：</p>
+<p>error_code:
+<em> bit 0 == 0 means no page found, 1 means protection fault
+</em> bit 1 == 0 means read, 1 means write
+<em> bit 2 == 0 means kernel, 1 means user-mode
+</em> bit 3 == 0 means data, 1 means instruction</p>
+    </div>
+    <div id="content-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">var disqus_shortname="sdphome";(function(){var a=document.createElement("script");a.type="text/javascript";a.async=true;a.src="//"+disqus_shortname+".disqus.com/embed.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)})();</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+</div>
+<div class="niu2-right-container col-md-2">
+    <div id="niu2-sidebar-meta" class="niu2-sidebar">
+        <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
+        <div class="niu2-sidebar-value">2012-05-18 15:50</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-android"></i>分类:</div>
+        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/android/index.html">android/kernel</a></div>
+        <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
+ 
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/hui-bian-oopscrashlinux.html">汇编，oops，crash，linux</a><sup>1</sup></div>
+    </div>
+
+    <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
+        <div class="niu2-sidebar-label">
+            <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
+        </div>
+        <ol id="niu2-sidebar-toc-list">
+            <li><a href="#content-heading">oops的解读方法-----怎么通过oops查找源码行</a></li>
+            <li><a href='#72fa7c88b797342c8d89035066661dc5'>分析</a></li><li><a href='#cd8992b644e6c18367861a4d913fd116'>验证</a></li><li><a href='#9822c60db4d9f49c20ba67a188d5c86f'>疑问</a></li><li><a href='#f574c1735434fbe9498b74b6967b14d8'>解答</a></li>
+            <li><a href="#content-comments">评论</a></li>
+        </ol>
+    </div>
+</div>
+<div id="niu2-toolbar">
+    <ul class="list-unstyled">
+        <li><a id="niu2-toolbar-ctrlsidebar" href="#" title="隐藏侧边栏"><i class="fa fa-3x fa-chevron-circle-right"></i></a></li>
+        <li><a id="niu2-toolbar-revhistory" href="#" title="修订历史"><i class="fa fa-3x fa-clock-o"></i></a></li>
+        <li><a id="niu2-toolbar-viewsource" href="#" title="查看源文件"><i class="fa fa-file-text-o" style="font-size:2.65em;margin-top:2px;"></i></a></li>
+    </ul>
+    <div id="niu2-toolbar-showsidebar" data-title="显示侧边栏"></div>
+    <div id="niu2-toolbar-github" data-repo="sdphome/blog-content"></div>
+    <div id="niu2-toolbar-bitbucket" data-repo=""></div>
+</div>
+    </div>
+
+    <div id="body-footer" class="col-md-6 col-md-offset-2">
+<div class="niu2-footer">
+    <hr/>
+	<p>
+		Powered by <a href="https://github.com/getpelican/pelican">Pelican</a>, 
+        <a href="https://github.com/mawenbao/niu-x2-sidebar">theme</a> built with <a href="http://getbootstrap.com">Bootstrap3</a>
+		by <a href="http://blog.atime.me">Ma Wenbao</a>, icons by 
+		<a href="http://fortawesome.github.io/Font-Awesome">Font Awesome</a>.
+	</p>
+	<p>
+		©
+				2012-2014
+		<a class="niu2-footer-link" href="http://sdphome.github.io">Shao Depeng</a>
+        / 			<a class="niu2-footer-link" href="/about.html" title="about me">关于</a>
+        / 			<a class="niu2-footer-link" href="/agreement.html" title="terms, license and privacy etc.">协议</a>
+    </p>
+    <p class="niu2-icons">
+	        <a class="niu2-footer-icon" href="mailto: dp.shao@gmail.com" title="my email address">
+	            <i class="fa fa-envelope-o fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="http://github.com/sdphome" title="my github page">
+	            <i class="fa fa-github-alt fa-lg"></i>
+	        </a>
+	        <a class="niu2-footer-icon" href="/feed.xml" title="subscribe my blog">
+	            <i class="fa fa-rss fa-lg"></i>
+	        </a>
+	</p>
+</div>    </div>
+<script type="text/javascript">var _gaq=_gaq||[];_gaq.push(["_setAccount","UA-77974223-1"]);_gaq.push(["_trackPageview"]);(function(){var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=("https:"==document.location.protocol?"https://ssl":"http://www")+".google-analytics.com/ga.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)})();</script>    
+    <div id="niu2-pygments" data-theme="github"></div>
+
+    <script type="text/javascript" src="http://sdphome.github.io/theme/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="http://sdphome.github.io/theme/js/niu2.min.js"></script>
+    <script type="text/javascript" src="http://sdphome.github.io/theme/js/bootstrap.min.js"></script>
+    <div id="niu2-lazy-load-text" data-loading="orz 努力加载中"></div>
+    <script type="text/javascript">onContentLoaded();</script>
+  </body>
+</html>

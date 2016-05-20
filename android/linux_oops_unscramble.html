@@ -247,6 +247,8 @@ ffffffff 67e04544 00000009<br/>
             <span class="n">return</span> <span class="n">BCME_ERROR</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="o">........(</span><span class="err">下面省略一大段</span><span class="o">)</span>
+    <span class="err">}</span>
+<span class="err">}</span>
 </pre></div>
 <p>由</p>
 <div class="highlight"><pre><span></span>PC is at dhdsdio_htclk+0x28/0x438 [dhd]
@@ -320,7 +322,7 @@ typedef const struct si_pub si_t;
 <p>单从该问题来说，我觉得可能是因为sih这个变量已经被deatch了，但是还没有验证，问题比较偶现，，唉，，最烦偶现的bug了，，</p>
 <p>其实写这篇文章的目的也主要是为了讲述怎么从oops信息中去查找对应c代码中的错误行的，在linux内核调试中还是很有用的。</p>
 <blockquote>
-<p>Unable to handle kernel paging request at virtual address <pre class="cpp" name="code">9c0d5030  </pre></p>
+<p>Unable to handle kernel paging request at virtual address &lt;pre name="code" class="cpp"&gt;9c0d5030  </p>
 </blockquote>
 <p>其实对于这句话我还是没有能够理解到底是怎么了，怎么会出现这种错误，</p>
 <p>如果哪位朋友对这个比较了解的话，希望能不吝赐教，多多回帖帮我解惑，再此先感谢了。</p>
@@ -328,14 +330,17 @@ typedef const struct si_pub si_t;
 <p>ps: 解答上面的问题</p>
 <h2 id="f574c1735434fbe9498b74b6967b14d8">解答</h2>
 <p>不能访问的内核虚地址为45685516，内核中一般可访问的地址都是以0xCXXXXXXX开头的地址。</p>
-<p>Oops: 0002 [#1]</p>
+<div class="highlight"><pre><span></span><span class="n">Oops</span><span class="o">:</span> <span class="mi">0002</span> <span class="o">[</span><span class="err">#</span><span class="mi">1</span><span class="o">]</span>
+</pre></div>
 <p>这里面，0002表示Oops的错误代码（写错误，发生在内核空间），#1表示这个错误发生一次。</p>
 <p>Oops的错误代码根据错误的原因会有不同的定义，本文中的例子可以参考下面的定义（如果发现自己遇到的Oops和下面无法对应的话，最好去内核代码里查找）：</p>
-<p>error_code:
-<em> bit 0 == 0 means no page found, 1 means protection fault
-</em> bit 1 == 0 means read, 1 means write
-<em> bit 2 == 0 means kernel, 1 means user-mode
-</em> bit 3 == 0 means data, 1 means instruction</p>
+<p>error_code:</p>
+<ul>
+<li>bit 0 == 0 means no page found, 1 means protection fault</li>
+<li>bit 1 == 0 means read, 1 means write</li>
+<li>bit 2 == 0 means kernel, 1 means user-mode</li>
+<li>bit 3 == 0 means data, 1 means instruction</li>
+</ul>
     </div>
     <div id="content-comments">
 <div id="disqus_thread"></div>

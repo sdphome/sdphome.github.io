@@ -358,4 +358,95 @@ typedef const struct si_pub si_t;
 &lt;li&gt;bit 1 == 0 means read, 1 means write&lt;/li&gt;
 &lt;li&gt;bit 2 == 0 means kernel, 1 means user-mode&lt;/li&gt;
 &lt;li&gt;bit 3 == 0 means data, 1 means instruction&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Fri, 18 May 2012 15:50:12 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-18:android/linux_oops_unscramble.html</guid><category>汇编，oops，crash，linux</category></item></channel></rss>
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Fri, 18 May 2012 15:50:12 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-18:android/linux_oops_unscramble.html</guid><category>汇编，oops，crash，linux</category></item><item><title>input子系统 KeyPad-Touch上报数据格式与机制</title><link>http://sdphome.github.io/android/input_subsystem_report_data_format.html</link><description>&lt;h3 id="6c6f817b9c7779980c4d9308711c6cf4"&gt;上报格式&lt;/h3&gt;
+&lt;p&gt;linux drive中input子系统上报信息，调用函数&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;input子系统最终调用&lt;code&gt;copy_to_user(buffer, event, sizeof(struct input_event))&lt;/code&gt;将信息上报给上层，event为&lt;code&gt;struct input_event&lt;/code&gt;类型结构体， 中间会有一些处理将 type，code，value值打包成input_event类型的数据。底层上报该结构体给上层。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;struct input_event {
+    struct timeval time;
+    __u16 type;
+    __u16 code;
+    __s32 value;
+};
+
+struct timeval {
+    __kernel_time_t tv_sec; /* seconds */
+    __kernel_suseconds_t tv_usec; /* microseconds */
+};
+
+typedef long        __kernel_time_t;
+typedef int __kernel_suseconds_t;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;h4 id="cb288858881480409f938046ddd76276"&gt;对于keypad&lt;/h4&gt;
+&lt;p&gt;type为事件类型，按键为EV_KEY,在include/linux/input.h中,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#define EV_KEY    0x01
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;code为按键的值，value用于标记按键是按下还是弹起，1是按下，0是弹起。
+按下和弹起事件只需上报一次。&lt;/p&gt;
+&lt;h4 id="f6c657cf07dcfa1d7dac7fbcd3ba7e9c"&gt;对于touch&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;static inline void input_report_abs(struct input_dev *dev, unsigned int code, int value)&lt;/code&gt;  为input_event的封装，函数如下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_event(dev, EV_ABS, code, value);
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;type为EV_ABS,  #define EV_ABS   0X03,&lt;/p&gt;
+&lt;p&gt;code的值，根据上报属性的不同，分别如下：&lt;/p&gt;
+&lt;p&gt;&lt;font color="red"&gt;多点触摸&lt;/font&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#define ABS_MT_TOUCH_MAJOR 0x30 /* Major axis of touching ellipse */
+#define ABS_MT_TOUCH_MINOR 0x31 /* Minor axis (omit if circular) */
+#define ABS_MT_WIDTH_MAJOR 0x32 /* Major axis of approaching ellipse */
+#define ABS_MT_WIDTH_MINOR 0x33 /* Minor axis (omit if circular) */
+#define ABS_MT_ORIENTATION 0x34 /* Ellipse orientation */
+#define ABS_MT_POSITION_X 0x35 /* Center X ellipse position */
+#define ABS_MT_POSITION_Y 0x36 /* Center Y ellipse position */
+#define ABS_MT_TOOL_TYPE 0x37 /* Type of touching device */
+#define ABS_MT_BLOB_ID 0x38 /* Group a set of packets as a blob */
+#define ABS_MT_TRACKING_ID 0x39 /* Unique ID of initiated contact */
+#define ABS_MT_PRESSURE 0x3a /* Pressure on contact area */
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;ABS_MT_TOUCH_MAJOR和ABS_MT_PRESSURE实现一个应该就可以了。&lt;/p&gt;
+&lt;p&gt;&lt;font color="red"&gt;多点触摸&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;input.h中列举了很多属性，但只需实现以下几种即可。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#define ABS_X 0x00
+#define ABS_Y 0x01
+#define ABS_Z 0x02  //一般不必实现
+#define ABS_PRESSURE 0x18
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;下面一个BTN_TOUCH为点击事件，单点触摸中需要上报点击事件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#define BTN_TOUCH 0x14a
+&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id="2d1fed5e3e87a0ae28851cdc20766360"&gt;touch点上报机制&lt;/h3&gt;
+&lt;p&gt;&lt;font color="red"&gt;多点触摸&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;value为对应属性的值，如code为ABS_MT_POSITION_X，则value的值为就为x轴坐标。&lt;/p&gt;
+&lt;p&gt;当把一个点的信息发送完毕以后，还需加上input_mt_sync（注意：即使只有一个点也需要加上），这个函数转换成input_event事件为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_event(dev, EV_SYN, SYN_MT_REPORT, 0);
+#define EV_SYN  0x00
+#define SYN_MT_REPORT    2
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;则type为0x00，code为2，value为0。&lt;/p&gt;
+&lt;p&gt;接着再上报第二个点，第二个点上报结束，依旧要上报input_mt_sync，直至最后一次报点结束，加上input_sync，转换成input_event事件为&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_event(dev, EV_SYN, SYN_REPORT, 0)；
+#define EV_SYN  0x00
+#define SYN_REPORT 0
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;则type为0x00，code为0，value为0。至此报点结束。&lt;/p&gt;
+&lt;p&gt;点需要一直上报。&lt;/p&gt;
+&lt;p&gt;Linux 驱动中的例子&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_report_abs(ssd2531_data.input, ABS_MT_TRACKING_ID, 1);
+input_report_abs(ssd2531_data.input, ABS_MT_TOUCH_MAJOR, PRESS_STATUS);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_X, X_COOR);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_Y, Y_COOR);
+input_mt_sync(ssd2531_data.input);
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;font color="red"&gt;单点触摸&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;单点上报同多点上报差不多，只是不需要input_mt_sync了，上报过程中需要&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_event(dev, EV_KEY, BTN_TOUCH,  0/1 );
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;value为1，代表按下，value为0代表抬起。code值为BTN_TOUCH，  #define BTN_TOUCH 0x14a；&lt;/p&gt;
+&lt;p&gt;同样最后结束需要input_sync。&lt;/p&gt;
+&lt;p&gt;linux驱动的例子:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;input_report_abs(ts.input, ABS_X, ts.xp);
+input_report_abs(ts.input, ABS_Y, ts.yp);
+input_report_key(ts.input, BTN_TOUCH, 1);
+input_sync(ts.input);
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;input_event结构体中，有一个成员为struct timeval time;用来记录此刻的墙上时间。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Tue, 17 Apr 2012 14:48:23 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-04-17:android/input_subsystem_report_data_format.html</guid><category>input</category><category>linux</category><category>touch</category><category>keypad</category></item></channel></rss>

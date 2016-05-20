@@ -3,13 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Android HAL层实现与调用 - SDP日常笔记</title>
+    <title>input子系统 KeyPad-Touch上报数据格式与机制 - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
 
-    <link rel="canonical" href="http://sdphome.github.io/android/android_hal_call_and_achieve.html" />
+    <link rel="canonical" href="http://sdphome.github.io/android/input_subsystem_report_data_format.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -100,128 +100,102 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-    <h1 id="content-heading">Android HAL层实现与调用</h1>
+    <h1 id="content-heading">input子系统 KeyPad-Touch上报数据格式与机制</h1>
 </div>
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
-        <h2 id="42cd81a3f07e1360c430197f8e4e46ae">HAL层实现</h2>
-<p>在这篇文章中我们讨论下HAL层代码的简单组成，以及jni是如何调用HAL层代码。文章尽量避免了一些无用信息，直接写有实际的东西。</p>
-<p>在这里我用一个简单的HAL层代码(电子防眩目的hal代码)来开始我们的讲解。</p>
-<p>在一个hal代码中主要的工作是实现一个名为<code>HAL_MODULE_INFO_SYM</code>的module实例，其结构定义为:</p>
-<div class="highlight"><pre><span></span>    struct lcd_reflect_module_t {
-        struct hw_module_t common;
-    };
+        <h3 id="6c6f817b9c7779980c4d9308711c6cf4">上报格式</h3>
+<p>linux drive中input子系统上报信息，调用函数</p>
+<div class="highlight"><pre><span></span>void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
 </pre></div>
-<p>可以看到这个结构的名字是随意的，一般用(模块名_module_t)来表示，可以看到它只有一个成员变量hw_module_t，也就是说主要的工作就是填充这个hw_module_t这个结构了。</p>
-<div class="highlight"><pre><span></span>const struct lcd_reflect_module_t HAL_MODULE_INFO_SYM = {
-    .common = {
-        .tag = HARDWARE_MODULE_TAG,
-        .version_major = 1,
-        .version_minor = 0,
-        .id = LCD_REFLECT_HARDWARE_MODULE_ID,
-        .name = "LCD Reflect",
-        .author = "Archermind Tech.",
-        .methods = &amp;lcd_reflect_module_methods,
-    }
+<p>input子系统最终调用<code>copy_to_user(buffer, event, sizeof(struct input_event))</code>将信息上报给上层，event为<code>struct input_event</code>类型结构体， 中间会有一些处理将 type，code，value值打包成input_event类型的数据。底层上报该结构体给上层。</p>
+<div class="highlight"><pre><span></span>struct input_event {
+    struct timeval time;
+    __u16 type;
+    __u16 code;
+    __s32 value;
 };
-</pre></div>
-<p>可以看到其中只有一个open函数指针，作为module的callback。</p>
-<p>前面我们已经接触了两个重要的结构体，hw_module_t和hw_module_methods_t，下面我们还需要来看一下hal层中第三个重要的结构体hw_device_t。</p>
-<p>下面我们来看一下<code>hw_module_methods_t</code>中的open函数<code>lcd_reflect_module_methods</code>。</p>
-<div class="highlight"><pre><span></span>static int
-lcd_reflect_open(const struct hw_module_t *module,
 
-              const char *name, struct hw_device_t **device)
-{
-    int status = -EINVAL;
-
-    LOGV("lcd_reflect_open\n");
-    if (!strcmp(name, LCD_REFLECT_HARDWARE)) {
-        struct lcd_reflect_device_t *dev;
-
-        dev = malloc(sizeof (*dev));
-        memset(dev, 0, sizeof (*dev));
-
-        dev-&gt;common.tag = HARDWARE_DEVICE_TAG;
-        dev-&gt;common.version = 0;
-        dev-&gt;common.module = (struct hw_module_t *)module;
-        dev-&gt;common.close = lcd_reflect_close;
-
-        *device = &amp;dev-&gt;common;
-
-        dev-&gt;get_level = &amp;lcd_reflect_get_level;
-        dev-&gt;set_level = &amp;lcd_reflect_set_level;
-        dev-&gt;get_state = &amp;lcd_reflect_get_state;
-        dev-&gt;set_state = &amp;lcd_reflect_set_state;
-
-        status = 0;
-    }
-
-    return status;
-}
-</pre></div>
-<p>可以看到hw_device_t作为open的形参传入open函数中，并且我们还发现了另外一个结构体<code>struct lcd_reflect_device_t *dev;</code>这个结构是我们模块自己定义的，用于存放一些我们模块需要的操作，jni层中就是通过这个结构体来调用hal层中提供的接口的。看一下它的定义。</p>
-<div class="highlight"><pre><span></span>struct lcd_reflect_device_t {
-    struct hw_device_t common;
-
-    /**
-     * Get the mxc_reflect state
-     *
-     * Returns: 0 on success, error code on failure
-     */
-    int (*get_state)(struct lcd_reflect_device_t *dev,
-                     int *stat);
-
-    /**
-     * Set the mxc_reflect state
-     *
-     * Returns: 0 on success, error code on failure
-     */
-    int (*set_state)(struct lcd_reflect_device_t *dev,
-                     int stat);
-
-    /**
-     * Get the mxc_reflect level
-     *
-     * Returns: 0 on success, error code on failure
-     */
-    int (*get_level)(struct lcd_reflect_device_t *dev,
-                    int *level);
-
-    /**
-     * Set the mxc_reflect state
-     *
-     * Returns: 0 on success, error code on failure
-     */
-    int (*set_level)(struct lcd_reflect_device_t *dev,
-                    int level);
+struct timeval {
+    __kernel_time_t tv_sec; /* seconds */
+    __kernel_suseconds_t tv_usec; /* microseconds */
 };
-</pre></div>
-<p>里面有hw_device_t这个成员，并且它是在最前面的一个成员，这个是非常重要的，我们将在下面说明为什么它需要放在最前面，除了hw_device_t就是一些hal层需要提供给jni调用的函数指针。</p>
-<p>再回到open函数中，现在我们就能看懂这个open函数所做的工作了，它首先注册了一个<code>struct lcd_reflect_device_t *dev; lcd_reflect_device_t</code>变量，然后填充common，也就是hw_device_t这个结构，这里需要注意有几个成员：</p>
-<p>tag：必须指定为<code>HARDWARE_DEVICE_TAG</code></p>
-<p>还需要实现一个close函数，接着*device= &amp;dev-&gt;common;，即让jni的hw_device_t与hal中的<code>lcd_reflect_device_t</code>联系在一起了，由于common这个成员在<code>lcd_reflect_device_t</code>的最前面定义的，那么也就是<code>lcd_reflect_device_t</code>的地址和common的地址是相同的。只要知道common的地址就可以知道<code>lcd_reflect_device_t</code>的地址，这样<code>lcd_reflect_device_t</code>结构就可以传送到jni层使用了，只需要将common的地址强制转换一下即可。最后把hal层需要提供给jni的API实现就可以了。这样一个简单的hal层代码框架就有啦。</p>
-<h2 id="45cc179d49cae26720730453c5546be2">调用HAL</h2>
-<p>在jni层，我们通过hw_get_module函数得到hw_module_t结构，如下：</p>
-<div class="highlight"><pre><span></span>hw_get_module(LCD_REFLECT_HARDWARE_MODULE_ID,(hw_module_t const**)&amp;module);
-</pre></div>
-<p>通过指定<code>LCD_REFLECT_HARDWARE_MODULE_ID</code>来区别module,接着还需要得到<code>lcd_reflect_device_t*device;</code>这个结构，我们可以通过下面这个函数实现：</p>
-<div class="highlight"><pre><span></span>static lcd_reflect_device_t *
-get_device(hw_module_t *module, char const *name)
-{
-    int err;
-    hw_device_t *device;
 
-    err = module-&gt;methods-&gt;open(module, name, &amp;device);
-    if (err == 0) {
-        return (lcd_reflect_device_t *)device;
-    } else {
-        return NULL;
-    }
-}
+typedef long        __kernel_time_t;
+typedef int __kernel_suseconds_t;
 </pre></div>
-<p>函数返回的是<code>lcd_reflect_device_t</code>结构的地址，在函数中首先定义<code>hw_device_t*device;</code>接着将其通过<code>module-&gt;methods-&gt;open(module,name, &amp;device);</code>得到<code>hw_device_t</code>这个结构的地址，接着将这个地址返回，返回前需要将地址类型强制转换一下，<code>(lcd_reflect_device_t*)device</code>，这样就得到<code>lcd_reflect_device_t</code>这个结构的地址啦。原因我们在上面讲过，是因为<code>hw_device_t</code>和<code>lcd_reflect_device_t</code>两个结构的首地址是相同的。</p>
-<p>有了<code>lcd_reflect_device_t</code>我们就可以调用hal层中实现的API啦，通过这些API操作硬件。</p>
+<h4 id="cb288858881480409f938046ddd76276">对于keypad</h4>
+<p>type为事件类型，按键为EV_KEY,在include/linux/input.h中,</p>
+<div class="highlight"><pre><span></span>#define EV_KEY    0x01
+</pre></div>
+<p>code为按键的值，value用于标记按键是按下还是弹起，1是按下，0是弹起。
+按下和弹起事件只需上报一次。</p>
+<h4 id="f6c657cf07dcfa1d7dac7fbcd3ba7e9c">对于touch</h4>
+<p><code>static inline void input_report_abs(struct input_dev *dev, unsigned int code, int value)</code>  为input_event的封装，函数如下</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_ABS, code, value);
+</pre></div>
+<p>type为EV_ABS,  #define EV_ABS   0X03,</p>
+<p>code的值，根据上报属性的不同，分别如下：</p>
+<p><font color="red">多点触摸</font></p>
+<div class="highlight"><pre><span></span>#define ABS_MT_TOUCH_MAJOR 0x30 /* Major axis of touching ellipse */
+#define ABS_MT_TOUCH_MINOR 0x31 /* Minor axis (omit if circular) */
+#define ABS_MT_WIDTH_MAJOR 0x32 /* Major axis of approaching ellipse */
+#define ABS_MT_WIDTH_MINOR 0x33 /* Minor axis (omit if circular) */
+#define ABS_MT_ORIENTATION 0x34 /* Ellipse orientation */
+#define ABS_MT_POSITION_X 0x35 /* Center X ellipse position */
+#define ABS_MT_POSITION_Y 0x36 /* Center Y ellipse position */
+#define ABS_MT_TOOL_TYPE 0x37 /* Type of touching device */
+#define ABS_MT_BLOB_ID 0x38 /* Group a set of packets as a blob */
+#define ABS_MT_TRACKING_ID 0x39 /* Unique ID of initiated contact */
+#define ABS_MT_PRESSURE 0x3a /* Pressure on contact area */
+</pre></div>
+<p>ABS_MT_TOUCH_MAJOR和ABS_MT_PRESSURE实现一个应该就可以了。</p>
+<p><font color="red">多点触摸</font></p>
+<p>input.h中列举了很多属性，但只需实现以下几种即可。</p>
+<div class="highlight"><pre><span></span>#define ABS_X 0x00
+#define ABS_Y 0x01
+#define ABS_Z 0x02  //一般不必实现
+#define ABS_PRESSURE 0x18
+</pre></div>
+<p>下面一个BTN_TOUCH为点击事件，单点触摸中需要上报点击事件</p>
+<div class="highlight"><pre><span></span>#define BTN_TOUCH 0x14a
+</pre></div>
+<h3 id="2d1fed5e3e87a0ae28851cdc20766360">touch点上报机制</h3>
+<p><font color="red">多点触摸</font></p>
+<p>value为对应属性的值，如code为ABS_MT_POSITION_X，则value的值为就为x轴坐标。</p>
+<p>当把一个点的信息发送完毕以后，还需加上input_mt_sync（注意：即使只有一个点也需要加上），这个函数转换成input_event事件为</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_SYN, SYN_MT_REPORT, 0);
+#define EV_SYN  0x00
+#define SYN_MT_REPORT    2
+</pre></div>
+<p>则type为0x00，code为2，value为0。</p>
+<p>接着再上报第二个点，第二个点上报结束，依旧要上报input_mt_sync，直至最后一次报点结束，加上input_sync，转换成input_event事件为</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_SYN, SYN_REPORT, 0)；
+#define EV_SYN  0x00
+#define SYN_REPORT 0
+</pre></div>
+<p>则type为0x00，code为0，value为0。至此报点结束。</p>
+<p>点需要一直上报。</p>
+<p>Linux 驱动中的例子</p>
+<div class="highlight"><pre><span></span>input_report_abs(ssd2531_data.input, ABS_MT_TRACKING_ID, 1);
+input_report_abs(ssd2531_data.input, ABS_MT_TOUCH_MAJOR, PRESS_STATUS);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_X, X_COOR);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_Y, Y_COOR);
+input_mt_sync(ssd2531_data.input);
+</pre></div>
+<p><font color="red">单点触摸</font></p>
+<p>单点上报同多点上报差不多，只是不需要input_mt_sync了，上报过程中需要</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_KEY, BTN_TOUCH,  0/1 );
+</pre></div>
+<p>value为1，代表按下，value为0代表抬起。code值为BTN_TOUCH，  #define BTN_TOUCH 0x14a；</p>
+<p>同样最后结束需要input_sync。</p>
+<p>linux驱动的例子:</p>
+<div class="highlight"><pre><span></span>input_report_abs(ts.input, ABS_X, ts.xp);
+input_report_abs(ts.input, ABS_Y, ts.yp);
+input_report_key(ts.input, BTN_TOUCH, 1);
+input_sync(ts.input);
+</pre></div>
+<p>input_event结构体中，有一个成员为struct timeval time;用来记录此刻的墙上时间。</p>
     </div>
     <div id="content-comments">
 <div id="disqus_thread"></div>
@@ -234,13 +208,15 @@ get_device(hw_module_t *module, char const *name)
 <div class="niu2-right-container col-md-2">
     <div id="niu2-sidebar-meta" class="niu2-sidebar">
         <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
-        <div class="niu2-sidebar-value">2012-05-21 11:29</div>
+        <div class="niu2-sidebar-value">2012-04-17 14:48</div>
         <div class="niu2-sidebar-label"><i class="fa fa-android"></i>分类:</div>
         <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/android/index.html">android/kernel</a></div>
         <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
  
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/android.html">android</a><sup>1</sup></div>
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/hal.html">hal</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/input.html">input</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/linux.html">linux</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/touch.html">touch</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/keypad.html">keypad</a><sup>1</sup></div>
     </div>
 
     <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
@@ -248,8 +224,8 @@ get_device(hw_module_t *module, char const *name)
             <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
         </div>
         <ol id="niu2-sidebar-toc-list">
-            <li><a href="#content-heading">Android HAL层实现与调用</a></li>
-            <li><a href='#42cd81a3f07e1360c430197f8e4e46ae'>HAL层实现</a></li><li><a href='#45cc179d49cae26720730453c5546be2'>调用HAL</a></li>
+            <li><a href="#content-heading">input子系统 KeyPad-Touch上报数据格式与机制</a></li>
+            <li><a href='#6c6f817b9c7779980c4d9308711c6cf4'>上报格式</a><ul><li><a href='#cb288858881480409f938046ddd76276'>对于keypad</a></li><li><a href='#f6c657cf07dcfa1d7dac7fbcd3ba7e9c'>对于touch</a></li></ul></li><li><a href='#2d1fed5e3e87a0ae28851cdc20766360'>touch点上报机制</a></li>
             <li><a href="#content-comments">评论</a></li>
         </ol>
     </div>

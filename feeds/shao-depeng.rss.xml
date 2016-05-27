@@ -5,7 +5,25 @@
 &lt;p&gt;重启机器，在开机的过程中长按&lt;code&gt;shift&lt;/code&gt;键，使ubuntu进入grub mode，进入root shell，在root shell中输入下面两条命令即可:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mount -o rw,remount /
 chmod 440 /etc/sudoers
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Mon, 23 Jun 2014 18:26:01 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2014-06-23:ubuntu/sudoers-777-unable-root.html</guid><category>root</category><category>ubuntu</category><category>sudoers</category></item><item><title>Android HAL层实现与调用</title><link>http://sdphome.github.io/android/android_hal_call_and_achieve.html</link><description>&lt;h2 id="42cd81a3f07e1360c430197f8e4e46ae"&gt;HAL层实现&lt;/h2&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Mon, 23 Jun 2014 18:26:01 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2014-06-23:ubuntu/sudoers-777-unable-root.html</guid><category>root</category><category>ubuntu</category><category>sudoers</category></item><item><title>对于camera调试中PCLK的计算</title><link>http://sdphome.github.io/android/camera-PCLK-calc.html</link><description>&lt;h2 id="608a240edfcff3a857752dbc6c26f831"&gt;关于PCLK&lt;/h2&gt;
+&lt;p&gt;PCLK即 pixclk,像素时钟信号&lt;/p&gt;
+&lt;p&gt;对于PAL信号和NTSC信号,两者PCLK分别为27M和27.2M&lt;/p&gt;
+&lt;h4 id="9da7578f9329ccaee1bbdf6a766744fd"&gt;计算公式&lt;/h4&gt;
+&lt;p&gt;1728*625*25=27000000&lt;/p&gt;
+&lt;p&gt;1728*525*30=27216000&lt;/p&gt;
+&lt;p&gt;其中1728=720*2+8+280&lt;/p&gt;
+&lt;h2 id="295975c6eb66987ece18e87b94117bd9"&gt;BT656 每一行数据组成（Lines）&lt;/h2&gt;
+&lt;p&gt;下面说明每一行的组成，一行是由4个部分组成：&lt;/p&gt;
+&lt;p&gt;行 = 结束码（EAV） + 水平消隐（Horizontal Vertical Blanking） + 起始码（SAV） + 有效数据（Active Video）&lt;/p&gt;
+&lt;p&gt;典型的一行数据组成如下图所示：&lt;/p&gt;
+&lt;p&gt;&lt;a href="/static/images/android/BT656-Lines.png"&gt;BT656 LINES&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;起始码（SAV）和结束码（EAV），它是标志着一行的开始结束的重要标记，也包含了其他的一些重要的信息。&lt;/p&gt;
+&lt;p&gt;为什么水平消隐 是280字节，这个我暂时还没搞清楚，不知道是不是标准定义的。&lt;/p&gt;
+&lt;p&gt;为什么一行中的有效数据是 1440 字节？ 因为PAL制式的SDTV或者D1的分辨率为 720*576，即一行有720个有效点，由于采集的是彩色图像，那么一行就是由亮度信息（Y）和色差信息（CbCr）组成的，由于是 YCbCr422格式，故一行中有720列Y，720列CbCr，这样，一行的有效字节数就自然为 720 x 2 = 1440 字节了。&lt;/p&gt;
+&lt;p&gt;从上面可以看出BT656格式的数据一行组成需要1728字节，然后PAL有625行，NTSC有525行，两种制式的数据刷新频率分别是25HZ和30HZ&lt;/p&gt;
+&lt;p&gt;这样更新一个像素点需要的时钟即为刚开始写的，&lt;/p&gt;
+&lt;p&gt;PAL：1728&lt;em&gt;625&lt;/em&gt;25=27000000 HZ&lt;/p&gt;
+&lt;p&gt;NTSC：1728&lt;em&gt;525&lt;/em&gt;30=27216000 HZ&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Wed, 20 Jun 2012 15:05:00 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-06-20:android/camera-PCLK-calc.html</guid></item><item><title>Android HAL层实现与调用</title><link>http://sdphome.github.io/android/android_hal_call_and_achieve.html</link><description>&lt;h2 id="42cd81a3f07e1360c430197f8e4e46ae"&gt;HAL层实现&lt;/h2&gt;
 &lt;p&gt;在这篇文章中我们讨论下HAL层代码的简单组成，以及jni是如何调用HAL层代码。文章尽量避免了一些无用信息，直接写有实际的东西。&lt;/p&gt;
 &lt;p&gt;在这里我用一个简单的HAL层代码(电子防眩目的hal代码)来开始我们的讲解。&lt;/p&gt;
 &lt;p&gt;在一个hal代码中主要的工作是实现一个名为&lt;code&gt;HAL_MODULE_INFO_SYM&lt;/code&gt;的module实例，其结构定义为:&lt;/p&gt;
@@ -358,7 +376,7 @@ typedef const struct si_pub si_t;
 &lt;li&gt;bit 1 == 0 means read, 1 means write&lt;/li&gt;
 &lt;li&gt;bit 2 == 0 means kernel, 1 means user-mode&lt;/li&gt;
 &lt;li&gt;bit 3 == 0 means data, 1 means instruction&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Fri, 18 May 2012 15:50:12 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-18:android/linux_oops_unscramble.html</guid><category>汇编，oops，crash，linux</category></item><item><title>input子系统 KeyPad-Touch上报数据格式与机制</title><link>http://sdphome.github.io/android/input_subsystem_report_data_format.html</link><description>&lt;h3 id="6c6f817b9c7779980c4d9308711c6cf4"&gt;上报格式&lt;/h3&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Shao Depeng</dc:creator><pubDate>Fri, 18 May 2012 15:50:12 +0800</pubDate><guid isPermaLink="false">tag:sdphome.github.io,2012-05-18:android/linux_oops_unscramble.html</guid><category>汇编</category><category>oops</category><category>crash</category><category>linux</category></item><item><title>input子系统 KeyPad-Touch上报数据格式与机制</title><link>http://sdphome.github.io/android/input_subsystem_report_data_format.html</link><description>&lt;h3 id="6c6f817b9c7779980c4d9308711c6cf4"&gt;上报格式&lt;/h3&gt;
 &lt;p&gt;linux drive中input子系统上报信息，调用函数&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
 &lt;/pre&gt;&lt;/div&gt;

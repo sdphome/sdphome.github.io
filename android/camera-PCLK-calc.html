@@ -3,13 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用协议 - SDP日常笔记</title>
+    <title>对于camera调试中PCLK的计算 - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
 
-    <link rel="canonical" href="http://sdphome.github.io/agreement.html" />
+    <link rel="canonical" href="http://sdphome.github.io/android/camera-PCLK-calc.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -100,63 +100,60 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-    <h1 id="content-heading">使用协议</h1>
+    <h1 id="content-heading">对于camera调试中PCLK的计算</h1>
 </div>
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
-        <p>在访问本网站的内容之前，请务必仔细阅读本协议，若您继续访问本网站，则意味着您已<strong>仔细阅读并同意</strong>本协议。 本协议包括<a href="#2b4e44c84fe5e50917f2cb922a27ddbc">许可</a>、<a href="#d4cbff323306f0bacae9569adccf1c09">免责声明</a>和<a href="#69a934af98ebdae302fc794dfbfaa7b4">隐私政策</a>三部分内容，在<a href="#9881596e854c5f5b416288a88d0342a2">适用范围</a>内有效。 本网站保留随时更改和替换本协议的权利，最新版本的使用协议请参考本页面，恕不另行通知。如果您有任何疑问，请<a href="/about.html#1a59b4b3e9d33d250d80feb7579e0045" title="about me">联系我</a>。</p>
-<h2 id="9881596e854c5f5b416288a88d0342a2">适用范围(Scope)</h2>
-<p>除额外注明的地方外，本协议适用于atime.me域名及其子域名(二级域名)下的网站，这些网站在本协议中<strong>统称"本网站"</strong>。其中有些网站或原创内容可能另有附加条款，若这些附加条款与本协议有冲突，<strong>以附加条款为准</strong>。</p>
-<h2 id="2b4e44c84fe5e50917f2cb922a27ddbc">许可(License)</h2>
-<p>简单的说，除额外注明的地方外，您可以自由的浏览和分享本网站的原创文字作品，但需遵守以下条件:</p>
-<ol>
-<li><strong>署名</strong>: 使用本网站的原创作品时，请保留作者信息或文章出处，最简单的方法是注明原文的链接(url)地址。</li>
-<li><strong>相同方式共享</strong>: 以本网站的原创作品为基础进行创作时，您只能采用原协议(本网站原创作品使用的许可协议)发布您的新作品。</li>
-</ol>
-<p>详细许可说明:</p>
-<ol>
-<li>除额外注明的地方外，本网站的原创文字作品使用<a href="http://creativecommons.org/licenses/by-sa/3.0/deed.zh" title="CC BY-SA 3.0">知识共享署名-相同方式共享3.0版本许可协议</a>进行发布。</li>
-<li>除额外注明的地方外，本网站的原创代码按<a href="/LICENSE.txt" title="Code License">Apache License 2.0</a>发布，具体内容以代码内附的协议声明和LICENSE.txt文件为准。</li>
-<li>本网站转载或引用的内容，其版权归原作者或原网站所有，如果本网站侵犯了您的权利，请及时<a href="/about.html#1a59b4b3e9d33d250d80feb7579e0045" title="about me">联系我</a>。</li>
-<li>发表在本网站上的评论等用户创造内容(user generated content)，其版权归内容创造者本人所有。</li>
-</ol>
-<h2 id="d4cbff323306f0bacae9569adccf1c09">免责声明(Disclaimer)</h2>
-<ol>
-<li>在任何情况下，本网站都不对您因使用本网站上的内容而产生的任何直接损失、间接损失或惩罚性赔偿负责。这些内容包括但不限于:<ul>
-<li>本网站的原创内容(包括文章和代码等)。</li>
-<li>本网站转载或引用的内容。</li>
-<li>以链接或广告等形式出现在本网站上的内容。</li>
-</ul>
-</li>
-<li>发表在本网站上的评论等用户创造内容，仅代表内容创造者本人的观点，与本网站的看法和立场无关，内容创造者本人需对其发表的内容负责。</li>
-</ol>
-<h2 id="69a934af98ebdae302fc794dfbfaa7b4">隐私政策(Privacy Policy)</h2>
-<ol>
-<li>对于访问者的访问信息(包括IP地址、浏览器类型和地域信息等)，本网站可能会将其用于<a href="http://www.google.com/analytics/" title="Google 分析">Google Analytics</a>或<a href="http://tongji.baidu.com" title="百度统计">百度统计</a>等网络流量分析服务，除此之外本网站不会向任何第三方组织或个人泄漏或出售这些信息。</li>
-<li>本网站不会向任何第三方组织或个人泄漏或出售访问者的电子邮件地址等私人信息。</li>
-<li>本网站使用的<a href="http://www.google.com/analytics/" title="Google 分析">Google Analytics</a>和<a href="http://duoshuo.com" title="多说社会化评论">多说评论</a>等服务会在访问者的电脑(或移动设备)上储存<a href="http://zh.wikipedia.org/wiki/Cookie" title="wikipedia:cookie">cookie</a>，您可以通过更改浏览器的设置来禁用cookie。</li>
-<li>对于出现在本网站上的第三方网站或服务(包括各种链接和广告等)，本网站不对其隐私政策做任何担保。</li>
-</ol>
+        <h2 id="608a240edfcff3a857752dbc6c26f831">关于PCLK</h2>
+<p>PCLK即 pixclk,像素时钟信号</p>
+<p>对于PAL信号和NTSC信号,两者PCLK分别为27M和27.2M</p>
+<h4 id="9da7578f9329ccaee1bbdf6a766744fd">计算公式</h4>
+<p>1728*625*25=27000000</p>
+<p>1728*525*30=27216000</p>
+<p>其中1728=720*2+8+280</p>
+<h2 id="295975c6eb66987ece18e87b94117bd9">BT656 每一行数据组成（Lines）</h2>
+<p>下面说明每一行的组成，一行是由4个部分组成：</p>
+<p>行 = 结束码（EAV） + 水平消隐（Horizontal Vertical Blanking） + 起始码（SAV） + 有效数据（Active Video）</p>
+<p>典型的一行数据组成如下图所示：</p>
+<p><a href="/static/images/android/BT656-Lines.png">BT656 LINES</a></p>
+<p>起始码（SAV）和结束码（EAV），它是标志着一行的开始结束的重要标记，也包含了其他的一些重要的信息。</p>
+<p>为什么水平消隐 是280字节，这个我暂时还没搞清楚，不知道是不是标准定义的。</p>
+<p>为什么一行中的有效数据是 1440 字节？ 因为PAL制式的SDTV或者D1的分辨率为 720*576，即一行有720个有效点，由于采集的是彩色图像，那么一行就是由亮度信息（Y）和色差信息（CbCr）组成的，由于是 YCbCr422格式，故一行中有720列Y，720列CbCr，这样，一行的有效字节数就自然为 720 x 2 = 1440 字节了。</p>
+<p>从上面可以看出BT656格式的数据一行组成需要1728字节，然后PAL有625行，NTSC有525行，两种制式的数据刷新频率分别是25HZ和30HZ</p>
+<p>这样更新一个像素点需要的时钟即为刚开始写的，</p>
+<p>PAL：1728<em>625</em>25=27000000 HZ</p>
+<p>NTSC：1728<em>525</em>30=27216000 HZ</p>
     </div>
-    
-</div> 
-<div class="niu2-right-container col-md-2">
-<div id="niu2-sidebar-meta" class="niu2-sidebar">
-    <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
-    <div class="niu2-sidebar-value">2013-01-22 15:20</div>
-    <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
-    <div class="niu2-sidebar-value">2013-12-04 15:01</div>
+    <div id="content-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">var disqus_shortname="sdphome";(function(){var a=document.createElement("script");a.type="text/javascript";a.async=true;a.src="//"+disqus_shortname+".disqus.com/embed.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)})();</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </div>
 
-<div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
-    <div class="niu2-sidebar-label">
-        <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
+</div>
+<div class="niu2-right-container col-md-2">
+    <div id="niu2-sidebar-meta" class="niu2-sidebar">
+        <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
+        <div class="niu2-sidebar-value">2012-06-20 15:05</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
+        <div class="niu2-sidebar-value">2016-05-27 11:58</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-android"></i>分类:</div>
+        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/android/index.html">android/kernel</a></div>
+        <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
     </div>
-    <ol id="niu2-sidebar-toc-list">
-        <li><a href="#content-heading">使用协议</a></li>
-        <li><a href='#9881596e854c5f5b416288a88d0342a2'>适用范围(Scope)</a></li><li><a href='#2b4e44c84fe5e50917f2cb922a27ddbc'>许可(License)</a></li><li><a href='#d4cbff323306f0bacae9569adccf1c09'>免责声明(Disclaimer)</a></li><li><a href='#69a934af98ebdae302fc794dfbfaa7b4'>隐私政策(Privacy Policy)</a></li>
-    </ol>
-</div></div>
+
+    <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
+        <div class="niu2-sidebar-label">
+            <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
+        </div>
+        <ol id="niu2-sidebar-toc-list">
+            <li><a href="#content-heading">对于camera调试中PCLK的计算</a></li>
+            <li><a href='#608a240edfcff3a857752dbc6c26f831'>关于PCLK</a><ul><li><a href='#9da7578f9329ccaee1bbdf6a766744fd'>计算公式</a></li></ul></li><li><a href='#295975c6eb66987ece18e87b94117bd9'>BT656 每一行数据组成（Lines）</a></li>
+            <li><a href="#content-comments">评论</a></li>
+        </ol>
+    </div>
+</div>
 <div id="niu2-toolbar">
     <ul class="list-unstyled">
         <li><a id="niu2-toolbar-ctrlsidebar" href="#" title="隐藏侧边栏"><i class="fa fa-3x fa-chevron-circle-right"></i></a></li>

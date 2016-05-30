@@ -16,7 +16,7 @@ chmod 440 /etc/sudoers
 &lt;p&gt;下面说明每一行的组成，一行是由4个部分组成：&lt;/p&gt;
 &lt;p&gt;行 = 结束码（EAV） + 水平消隐（Horizontal Vertical Blanking） + 起始码（SAV） + 有效数据（Active Video）&lt;/p&gt;
 &lt;p&gt;典型的一行数据组成如下图所示：&lt;/p&gt;
-&lt;p&gt;&lt;a href="/static/images/android/BT656-Lines.png"&gt;BT656 LINES&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="BT656 LINES" src="/static/images/android/BT656-Lines.png"/&gt;&lt;/p&gt;
 &lt;p&gt;起始码（SAV）和结束码（EAV），它是标志着一行的开始结束的重要标记，也包含了其他的一些重要的信息。&lt;/p&gt;
 &lt;p&gt;为什么水平消隐 是280字节，这个我暂时还没搞清楚，不知道是不是标准定义的。&lt;/p&gt;
 &lt;p&gt;为什么一行中的有效数据是 1440 字节？ 因为PAL制式的SDTV或者D1的分辨率为 720*576，即一行有720个有效点，由于采集的是彩色图像，那么一行就是由亮度信息（Y）和色差信息（CbCr）组成的，由于是 YCbCr422格式，故一行中有720列Y，720列CbCr，这样，一行的有效字节数就自然为 720 x 2 = 1440 字节了。&lt;/p&gt;

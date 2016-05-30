@@ -3,13 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>对于camera调试中PCLK的计算 - SDP日常笔记</title>
+    <title>input子系统 KeyPad-Touch上报数据格式与机制 - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
 
-    <link rel="canonical" href="http://sdphome.github.io/android/camera-PCLK-calc.html" />
+    <link rel="canonical" href="http://sdphome.github.io/linux/input_subsystem_report_data_format.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -49,14 +49,14 @@
            </a>
            <ul class="dropdown-menu">
                <li><a href="http://sdphome.github.io/android/index.html">
-                      <i class="fa fa-android"></i>android/kernel
-                      (4)</a></li>
+                      <i class="fa fa-android"></i>android
+                      (1)</a></li>
                <li><a href="http://sdphome.github.io/cloud/index.html">
                       <i class="fa fa-cloud"></i>虚拟化/云
                       (1)</a></li>
-               <li><a href="http://sdphome.github.io/ubuntu/index.html">
-                      <i class="fa fa-linux"></i>ubuntu
-                      (1)</a></li>
+               <li><a href="http://sdphome.github.io/linux/index.html">
+                      <i class="fa fa-linux"></i>linux
+                      (4)</a></li>
            </ul>
         </li>
         <!--  self defined dropdown list -->
@@ -103,29 +103,102 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-    <h1 id="content-heading">对于camera调试中PCLK的计算</h1>
+    <h1 id="content-heading">input子系统 KeyPad-Touch上报数据格式与机制</h1>
 </div>
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
-        <h2 id="608a240edfcff3a857752dbc6c26f831">关于PCLK</h2>
-<p>PCLK即 pixclk,像素时钟信号</p>
-<p>对于PAL信号和NTSC信号,两者PCLK分别为27M和27.2M</p>
-<h4 id="9da7578f9329ccaee1bbdf6a766744fd">计算公式</h4>
-<p>1728*625*25=27000000</p>
-<p>1728*525*30=27216000</p>
-<p>其中1728=720*2+8+280</p>
-<h2 id="295975c6eb66987ece18e87b94117bd9">BT656 每一行数据组成（Lines）</h2>
-<p>下面说明每一行的组成，一行是由4个部分组成：</p>
-<p>行 = 结束码（EAV） + 水平消隐（Horizontal Vertical Blanking） + 起始码（SAV） + 有效数据（Active Video）</p>
-<p>典型的一行数据组成如下图所示：</p>
-<p><img alt="BT656 LINES" src="/static/images/android/BT656-Lines.png"/></p>
-<p>起始码（SAV）和结束码（EAV），它是标志着一行的开始结束的重要标记，也包含了其他的一些重要的信息。</p>
-<p>为什么水平消隐 是280字节，这个我暂时还没搞清楚，不知道是不是标准定义的。</p>
-<p>为什么一行中的有效数据是 1440 字节？ 因为PAL制式的SDTV或者D1的分辨率为 720*576，即一行有720个有效点，由于采集的是彩色图像，那么一行就是由亮度信息（Y）和色差信息（CbCr）组成的，由于是 YCbCr422格式，故一行中有720列Y，720列CbCr，这样，一行的有效字节数就自然为 720 x 2 = 1440 字节了。</p>
-<p>从上面可以看出BT656格式的数据一行组成需要1728字节，然后PAL有625行，NTSC有525行，两种制式的数据刷新频率分别是25HZ和30HZ</p>
-<p>这样更新一个像素点需要的时钟即为刚开始写的，</p>
-<p>PAL：1728<em>625</em>25=27000000 HZ</p>
-<p>NTSC：1728<em>525</em>30=27216000 HZ</p>
+        <h3 id="6c6f817b9c7779980c4d9308711c6cf4">上报格式</h3>
+<p>linux drive中input子系统上报信息，调用函数</p>
+<div class="highlight"><pre><span></span>void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+</pre></div>
+<p>input子系统最终调用<code>copy_to_user(buffer, event, sizeof(struct input_event))</code>将信息上报给上层，event为<code>struct input_event</code>类型结构体， 中间会有一些处理将 type，code，value值打包成input_event类型的数据。底层上报该结构体给上层。</p>
+<div class="highlight"><pre><span></span>struct input_event {
+    struct timeval time;
+    __u16 type;
+    __u16 code;
+    __s32 value;
+};
+
+struct timeval {
+    __kernel_time_t tv_sec; /* seconds */
+    __kernel_suseconds_t tv_usec; /* microseconds */
+};
+
+typedef long        __kernel_time_t;
+typedef int __kernel_suseconds_t;
+</pre></div>
+<h4 id="cb288858881480409f938046ddd76276">对于keypad</h4>
+<p>type为事件类型，按键为EV_KEY,在include/linux/input.h中,</p>
+<div class="highlight"><pre><span></span>#define EV_KEY    0x01
+</pre></div>
+<p>code为按键的值，value用于标记按键是按下还是弹起，1是按下，0是弹起。
+按下和弹起事件只需上报一次。</p>
+<h4 id="f6c657cf07dcfa1d7dac7fbcd3ba7e9c">对于touch</h4>
+<p><code>static inline void input_report_abs(struct input_dev *dev, unsigned int code, int value)</code>  为input_event的封装，函数如下</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_ABS, code, value);
+</pre></div>
+<p>type为EV_ABS,  #define EV_ABS   0X03,</p>
+<p>code的值，根据上报属性的不同，分别如下：</p>
+<p><font color="red">多点触摸</font></p>
+<div class="highlight"><pre><span></span>#define ABS_MT_TOUCH_MAJOR 0x30 /* Major axis of touching ellipse */
+#define ABS_MT_TOUCH_MINOR 0x31 /* Minor axis (omit if circular) */
+#define ABS_MT_WIDTH_MAJOR 0x32 /* Major axis of approaching ellipse */
+#define ABS_MT_WIDTH_MINOR 0x33 /* Minor axis (omit if circular) */
+#define ABS_MT_ORIENTATION 0x34 /* Ellipse orientation */
+#define ABS_MT_POSITION_X 0x35 /* Center X ellipse position */
+#define ABS_MT_POSITION_Y 0x36 /* Center Y ellipse position */
+#define ABS_MT_TOOL_TYPE 0x37 /* Type of touching device */
+#define ABS_MT_BLOB_ID 0x38 /* Group a set of packets as a blob */
+#define ABS_MT_TRACKING_ID 0x39 /* Unique ID of initiated contact */
+#define ABS_MT_PRESSURE 0x3a /* Pressure on contact area */
+</pre></div>
+<p>ABS_MT_TOUCH_MAJOR和ABS_MT_PRESSURE实现一个应该就可以了。</p>
+<p><font color="red">多点触摸</font></p>
+<p>input.h中列举了很多属性，但只需实现以下几种即可。</p>
+<div class="highlight"><pre><span></span>#define ABS_X 0x00
+#define ABS_Y 0x01
+#define ABS_Z 0x02  //一般不必实现
+#define ABS_PRESSURE 0x18
+</pre></div>
+<p>下面一个BTN_TOUCH为点击事件，单点触摸中需要上报点击事件</p>
+<div class="highlight"><pre><span></span>#define BTN_TOUCH 0x14a
+</pre></div>
+<h3 id="2d1fed5e3e87a0ae28851cdc20766360">touch点上报机制</h3>
+<p><font color="red">多点触摸</font></p>
+<p>value为对应属性的值，如code为ABS_MT_POSITION_X，则value的值为就为x轴坐标。</p>
+<p>当把一个点的信息发送完毕以后，还需加上input_mt_sync（注意：即使只有一个点也需要加上），这个函数转换成input_event事件为</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_SYN, SYN_MT_REPORT, 0);
+#define EV_SYN  0x00
+#define SYN_MT_REPORT    2
+</pre></div>
+<p>则type为0x00，code为2，value为0。</p>
+<p>接着再上报第二个点，第二个点上报结束，依旧要上报input_mt_sync，直至最后一次报点结束，加上input_sync，转换成input_event事件为</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_SYN, SYN_REPORT, 0)；
+#define EV_SYN  0x00
+#define SYN_REPORT 0
+</pre></div>
+<p>则type为0x00，code为0，value为0。至此报点结束。</p>
+<p>点需要一直上报。</p>
+<p>Linux 驱动中的例子</p>
+<div class="highlight"><pre><span></span>input_report_abs(ssd2531_data.input, ABS_MT_TRACKING_ID, 1);
+input_report_abs(ssd2531_data.input, ABS_MT_TOUCH_MAJOR, PRESS_STATUS);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_X, X_COOR);
+input_report_abs(ssd2531_data.input, ABS_MT_POSITION_Y, Y_COOR);
+input_mt_sync(ssd2531_data.input);
+</pre></div>
+<p><font color="red">单点触摸</font></p>
+<p>单点上报同多点上报差不多，只是不需要input_mt_sync了，上报过程中需要</p>
+<div class="highlight"><pre><span></span>input_event(dev, EV_KEY, BTN_TOUCH,  0/1 );
+</pre></div>
+<p>value为1，代表按下，value为0代表抬起。code值为BTN_TOUCH，  #define BTN_TOUCH 0x14a；</p>
+<p>同样最后结束需要input_sync。</p>
+<p>linux驱动的例子:</p>
+<div class="highlight"><pre><span></span>input_report_abs(ts.input, ABS_X, ts.xp);
+input_report_abs(ts.input, ABS_Y, ts.yp);
+input_report_key(ts.input, BTN_TOUCH, 1);
+input_sync(ts.input);
+</pre></div>
+<p>input_event结构体中，有一个成员为struct timeval time;用来记录此刻的墙上时间。</p>
     </div>
     <div id="content-comments">
 <div id="disqus_thread"></div>
@@ -138,12 +211,15 @@
 <div class="niu2-right-container col-md-2">
     <div id="niu2-sidebar-meta" class="niu2-sidebar">
         <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
-        <div class="niu2-sidebar-value">2012-06-20 15:05</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
-        <div class="niu2-sidebar-value">2016-05-30 15:34</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-android"></i>分类:</div>
-        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/android/index.html">android/kernel</a></div>
+        <div class="niu2-sidebar-value">2012-04-17 14:48</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-linux"></i>分类:</div>
+        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/linux/index.html">linux</a></div>
         <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
+ 
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/input.html">input</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/linux.html">linux</a><sup>2</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/touch.html">touch</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/keypad.html">keypad</a><sup>1</sup></div>
     </div>
 
     <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
@@ -151,8 +227,8 @@
             <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
         </div>
         <ol id="niu2-sidebar-toc-list">
-            <li><a href="#content-heading">对于camera调试中PCLK的计算</a></li>
-            <li><a href='#608a240edfcff3a857752dbc6c26f831'>关于PCLK</a><ul><li><a href='#9da7578f9329ccaee1bbdf6a766744fd'>计算公式</a></li></ul></li><li><a href='#295975c6eb66987ece18e87b94117bd9'>BT656 每一行数据组成（Lines）</a></li>
+            <li><a href="#content-heading">input子系统 KeyPad-Touch上报数据格式与机制</a></li>
+            <li><a href='#6c6f817b9c7779980c4d9308711c6cf4'>上报格式</a><ul><li><a href='#cb288858881480409f938046ddd76276'>对于keypad</a></li><li><a href='#f6c657cf07dcfa1d7dac7fbcd3ba7e9c'>对于touch</a></li></ul></li><li><a href='#2d1fed5e3e87a0ae28851cdc20766360'>touch点上报机制</a></li>
             <li><a href="#content-comments">评论</a></li>
         </ol>
     </div>

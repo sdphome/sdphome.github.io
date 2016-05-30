@@ -5,21 +5,21 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://sdphome.github.io/index.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/archives.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/categories.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -67,14 +67,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://sdphome.github.io/ubuntu/sudoers-777-unable-root.html</loc>
+<loc>http://sdphome.github.io/linux/sudoers-777-unable-root.html</loc>
 <lastmod>2016-05-20T14:39:02:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/android/camera-PCLK-calc.html</loc>
+<loc>http://sdphome.github.io/linux/camera-PCLK-calc.html</loc>
 <lastmod>2016-05-30T15:34:00:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
@@ -88,14 +88,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://sdphome.github.io/android/linux_oops_unscramble.html</loc>
+<loc>http://sdphome.github.io/linux/linux_oops_unscramble.html</loc>
 <lastmod>2012-05-18T15:50:12:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/android/input_subsystem_report_data_format.html</loc>
+<loc>http://sdphome.github.io/linux/input_subsystem_report_data_format.html</loc>
 <lastmod>2012-04-17T14:48:23:%s</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
@@ -103,112 +103,112 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://sdphome.github.io/android/index.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/cloud/index.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://sdphome.github.io/ubuntu/index.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<loc>http://sdphome.github.io/linux/index.html</loc>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/hal.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/input.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/keypad.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/hui-bian.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/sudoers.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/linux.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/crash.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/oops.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/ubuntu.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/touch.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/openstack.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/android.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://sdphome.github.io/tag/root.html</loc>
-<lastmod>2016-05-30T16:29:50-00:00</lastmod>
+<lastmod>2016-05-30T16:44:23-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>

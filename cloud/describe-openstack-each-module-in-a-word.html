@@ -3,13 +3,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sudoers文件属性为777后无法使用root - SDP日常笔记</title>
+    <title>一句话介绍openstack的每个组件 - SDP日常笔记</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/font-awesome/css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="http://sdphome.github.io/theme/css/niu2.min.css" type="text/css" />
 
-    <link rel="canonical" href="http://sdphome.github.io/ubuntu/sudoers-777-unable-root.html" />
+    <link rel="canonical" href="http://sdphome.github.io/cloud/describe-openstack-each-module-in-a-word.html" />
     
     <script type="text/javascript">window.onload=function(){};</script>
     <!--[if lt IE 9]>
@@ -103,17 +103,49 @@
     
     <div id="body-content">
 <div class="col-md-8 col-md-offset-2">
-    <h1 id="content-heading">sudoers文件属性为777后无法使用root</h1>
+    <h1 id="content-heading">一句话介绍openstack的每个组件</h1>
 </div>
 <div id="niu2-left-container" class="col-md-6 col-md-offset-2 with-right-border">
     <div id="niu2-main-content">
-        <h2 id="d6cfc9817231ad285f5e51b0d89b9e6e">问题形成原因</h2>
-<p>在使用ubuntu时有时为了添加root权限，需要将用户信息添加进<code>/etc/sudoers</code>，有些人为了方便，将这个文件的权限修改为777了，接着发现sudo的时候想使用root权限不可以了..</p>
-<h2 id="957a228f87aaf86e436762129485625a">解决方法</h2>
-<p>重启机器，在开机的过程中长按<code>shift</code>键，使ubuntu进入grub mode，进入root shell，在root shell中输入下面两条命令即可:</p>
-<div class="highlight"><pre><span></span>mount -o rw,remount /
-chmod 440 /etc/sudoers
-</pre></div>
+        <p>openstack使用模块化设计，正是由于这样的设计使得openstack可以有许多动态的模块。下面用一句话来简单概括openstack的每个模块的功能。</p>
+<blockquote>
+<p>Dashboard</p>
+</blockquote>
+<p>Openstack的Dashboard是基于OpenStack各个组件开发的web管理后台，它是一个网络接口组件。</p>
+<blockquote>
+<p>Keystone</p>
+</blockquote>
+<p>Keystone是openstack的身份认证/管理组件，它管理着tenants, users, roles, endpoints和一个services的列表。tenant是一个object的群组，users, instances, network都是一个object。users管理着一个role。</p>
+<blockquote>
+<p>Glance</p>
+</blockquote>
+<p>Glance是openstack的镜像管理组件，提供虚拟机镜像的发现，注册，取得服务。</p>
+<blockquote>
+<p>Neutron</p>
+</blockquote>
+<p>Neutron是openstack的网络管理组件，为openstack提供虚拟网络支持。</p>
+<blockquote>
+<p>Nova</p>
+</blockquote>
+<p>Nova是openstack的实例管理组件，它需要image, network, key pair, security group的支持才可以启动。</p>
+<blockquote>
+<p>Cinder</p>
+</blockquote>
+<p>Cinder是openstack的块存储组件，能够为instance创建卷并与instance绑定，它还提供了硬盘的snapshot的功能。</p>
+<blockquote>
+<p>Swift</p>
+</blockquote>
+<p>Swift是openstack的对象存储组件，为运行上下文提供服务。</p>
+<blockquote>
+<p>Ceilometer</p>
+</blockquote>
+<p>Ceilometer是openstack的统计组件，他能够收集openstack中的资源使用情况，可以用来警示资源额度。</p>
+<blockquote>
+<p>Heat</p>
+</blockquote>
+<p>Heat是openstack的协作组件，它能够自动的创建多个计算实例，并让他们一起协同工作。Head还可以与AWS CloundFormation兼容。</p>
+<p>参考资料：
+1. <a href="https://www.packtpub.com/virtualization-and-cloud/openstack-essentials">openstack Essentials</a></p>
     </div>
     <div id="content-comments">
 <div id="disqus_thread"></div>
@@ -126,16 +158,12 @@ chmod 440 /etc/sudoers
 <div class="niu2-right-container col-md-2">
     <div id="niu2-sidebar-meta" class="niu2-sidebar">
         <div class="niu2-sidebar-label"><i class="fa fa-calendar"></i>发布时间:</div>
-        <div class="niu2-sidebar-value">2014-06-23 18:26</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-pencil" style="font-size: 1.05em;"></i>最后修改:</div>
-        <div class="niu2-sidebar-value">2016-05-20 14:39</div>
-        <div class="niu2-sidebar-label"><i class="fa fa-linux"></i>分类:</div>
-        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/ubuntu/index.html">ubuntu</a></div>
+        <div class="niu2-sidebar-value">2016-05-30 16:28</div>
+        <div class="niu2-sidebar-label"><i class="fa fa-cloud"></i>分类:</div>
+        <div class="niu2-sidebar-value"><a href="http://sdphome.github.io/cloud/index.html">虚拟化/云</a></div>
         <div class="niu2-sidebar-label"><i class="fa fa-tag"></i>标签:</div>
  
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/root.html">root</a><sup>1</sup></div>
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/ubuntu.html">ubuntu</a><sup>1</sup></div>
-            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/sudoers.html">sudoers</a><sup>1</sup></div>
+            <div class="niu2-sidebar-inter-value niu2-sidebar-tag"><a href="http://sdphome.github.io/tag/openstack.html">openstack</a><sup>1</sup></div>
     </div>
 
     <div id="niu2-sidebar-toc" class="niu2-sidebar" data-status="closed">
@@ -143,8 +171,8 @@ chmod 440 /etc/sudoers
             <i id="niu2-sidebar-toc-ctrl" class="fa fa-plus"></i>目录
         </div>
         <ol id="niu2-sidebar-toc-list">
-            <li><a href="#content-heading">sudoers文件属性为777后无法使用root</a></li>
-            <li><a href='#d6cfc9817231ad285f5e51b0d89b9e6e'>问题形成原因</a></li><li><a href='#957a228f87aaf86e436762129485625a'>解决方法</a></li>
+            <li><a href="#content-heading">一句话介绍openstack的每个组件</a></li>
+            
             <li><a href="#content-comments">评论</a></li>
         </ol>
     </div>
